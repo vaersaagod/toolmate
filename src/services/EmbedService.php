@@ -75,10 +75,6 @@ class EmbedService extends Component
         // set the semi-ubiquitous parameters
         $maxWidth = isset($params['max_width']) ? '&maxwidth=' . $params['max_width'] : '';
         $maxHeight = isset($params['max_height']) ? '&maxheight=' . $params['max_height'] : '';
-        if (empty($maxHeight)) // correct for a bug in YouTube response if only maxheight is set and the video is over 612px wide
-        {
-            $maxHeight = '&maxheight=' . $maxWidth;
-        }
         $wmode_param = isset($params['wmode']) ? '&wmode=' . $params['wmode'] : '';
         $url .= $maxWidth . $maxHeight . $wmode_param;
 
