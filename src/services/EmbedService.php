@@ -51,22 +51,16 @@ class EmbedService extends Component
         foreach ($pluginVars as $var) {
             $videoData[$var] = false;
         }
-
-        // automatically handle scheme if https
-        $https = false;
-        if ((isset($params['force_https']) && $params['force_https']) || parse_url($videoUrl, PHP_URL_SCHEME) === 'https') {
-            $https = true;
-        }
-
+        
         // if it's not YouTube, Vimeo, Wistia, or Viddler bail
         if ($isYouTube) {
-            $url = 'http://www.youtube.com/oembed?format=xml&iframe=1' . ($https ? '&scheme=https' : '') . '&url=';
+            $url = 'https://www.youtube.com/oembed?format=xml&iframe=1&scheme=https&url=';
         } else if ($isVimeo) {
-            $url = 'http' . ($https ? 's' : '') . '://vimeo.com/api/oembed.xml?url=';
+            $url = 'https://vimeo.com/api/oembed.xml?url=';
         } else if ($isWistia) {
-            $url = 'http://app.wistia.com/embed/oembed.xml?url=';
+            $url = 'https://app.wistia.com/embed/oembed.xml?url=';
         } else if ($isViddler) {
-            $url = 'http://www.viddler.com/oembed/?format=xml&url=';
+            $url = 'https://www.viddler.com/oembed/?format=xml&url=';
         } else {
             return $videoData;
         }

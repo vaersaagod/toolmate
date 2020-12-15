@@ -7,7 +7,7 @@ Is that a tool in your pocket, or are you just happy to see me, mate!
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0 or later. 
+This plugin requires Craft CMS 3.1.0 or later. 
 
 ## Installation
 
