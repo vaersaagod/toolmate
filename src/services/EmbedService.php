@@ -54,7 +54,7 @@ class EmbedService extends Component
         
         // if it's not YouTube, Vimeo, Wistia, or Viddler bail
         if ($isYouTube) {
-            $url = 'https://www.youtube.com/oembed?format=xml&iframe=1&scheme=https&url=';
+            $url = 'https://www.youtube.com/oembed?format=xml&iframe=1&scheme=https&rel=0&url=';
         } else if ($isVimeo) {
             $url = 'https://vimeo.com/api/oembed.xml?url=';
         } else if ($isWistia) {
@@ -149,6 +149,8 @@ class EmbedService extends Component
         // add in the YouTube-specific params
         if ($isYouTube) {
             $youTubeParams = $this->getPrefixedParams($params, 'youtube_');
+            // Make sure related videos from different YouTube channels are opt-in
+            $youTubeParams['rel'] = $youTubeParams['rel'] ?? '0';
             if (!empty($youTubeParams)) {
                 //handle any YouTube-specific param updates
                 if (isset($youTubeParams['playlist'])) {
