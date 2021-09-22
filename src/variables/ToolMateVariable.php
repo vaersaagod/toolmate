@@ -72,4 +72,13 @@ class ToolMateVariable
         return ToolMate::$plugin->embed->getVideoEmbed($url, $params);
     }
 
+    /**
+     * @param $url
+     * @return array
+     */
+    public function getEmbed($url): array
+    {
+        return ToolMate::$plugin->embed->getEmbed($url);
+    }
+
 }

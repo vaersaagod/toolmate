@@ -5,6 +5,7 @@ namespace vaersaagod\toolmate\services;
 use Craft;
 use craft\base\Component;
 use craft\helpers\Template;
+use Embed\Embed;
 
 /**
  * Embed Service
@@ -15,6 +16,37 @@ use craft\helpers\Template;
  */
 class EmbedService extends Component
 {
+    /**
+     * @param string $url
+     * @return array
+     */
+    public function getEmbed(string $url = '') {
+        if ($url === '') {
+            return null;
+        }
+
+        try {
+            return \Craft::$app->cache->getOrSet(md5($url), function() use ($url) {
+                $embed = new Embed();
+                $data = $embed->get($url);
+                return [
+                    'title' => $data->title ?? '',
+                    'description' => $data->description ?? '',
+                    'url' => $data->url . '',
+                    'html' => $data->code->html ?? '',
+                    'width' => $data->code->width ?? 1280,
+                    'height' => $data->code->height ?? 720,
+                    'ratio' => $data->code->ratio ?? 56.25,
+                    'image' => $data->image . '',
+                    'provider' => $data->providerName ?? '',
+                ];
+            }, 3600);
+        } catch (\Exception $exception) {
+            // Craft::dd($exception);
+            return null;
+        }
+    }
+
     /**
      * @param string $videoUrl
      * @param array $params
@@ -51,7 +83,7 @@ class EmbedService extends Component
         foreach ($pluginVars as $var) {
             $videoData[$var] = false;
         }
-        
+
         // if it's not YouTube, Vimeo, Wistia, or Viddler bail
         if ($isYouTube) {
             $url = 'https://www.youtube.com/oembed?format=xml&iframe=1&scheme=https&rel=0&url=';
