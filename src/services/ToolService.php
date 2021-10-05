@@ -38,7 +38,7 @@ class ToolService extends Component
             return @file_get_contents($fileName);
         }
 
-        $documentRoot = Craft::parseEnv(ToolMate::$plugin->getSettings()->publicRoot ?? '@webroot');
+        $documentRoot = ToolMate::getInstance()->getSettings()->publicRoot;
         $filePath = FileHelper::normalizePath($documentRoot . '/' . $fileName);
 
         if ($fileName !== '' && file_exists($filePath)) {
@@ -59,7 +59,7 @@ class ToolService extends Component
      */
     public function stamp($fileName, $mode = 'file', $type = 'ts'): string
     {
-        $documentRoot = Craft::parseEnv(ToolMate::$plugin->getSettings()->publicRoot ?? '@webroot');
+        $documentRoot = ToolMate::getInstance()->getSettings()->publicRoot;
         $filePath = FileHelper::normalizePath($documentRoot . '/' . $fileName);
 
         if ($fileName === '' || !file_exists($filePath)) {

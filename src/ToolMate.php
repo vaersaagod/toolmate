@@ -4,6 +4,7 @@ namespace vaersaagod\toolmate;
 
 use Craft;
 use craft\base\Plugin;
+use craft\log\FileTarget;
 use craft\web\twig\variables\CraftVariable;
 
 use vaersaagod\toolmate\services\EmbedService;
@@ -59,7 +60,7 @@ class ToolMate extends Plugin
             'minify' => MinifyService::class,
         ]);
 
-        // Register tamplate variables
+        // Register template variables
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
@@ -73,17 +74,21 @@ class ToolMate extends Plugin
 
         // Add in our Twig extensions
         Craft::$app->view->registerTwigExtension(new ToolMateTwigExtension());
+
+        // Lets use our own log file
+        Craft::getLogger()->dispatcher->targets[] = new FileTarget([
+            'logFile' => '@storage/logs/toolmate.log',
+            'categories' => ['vaersaagod\toolmate\*'],
+        ]);
     }
 
     // Protected Methods
     // =========================================================================
 
     /**
-     * Creates and returns the model used to store the plugin’s settings.
-     *
-     * @return \craft\base\Model|null
+     * @return Settings
      */
-    protected function createSettingsModel()
+    protected function createSettingsModel(): Settings
     {
         return new Settings();
     }

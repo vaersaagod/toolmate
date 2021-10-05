@@ -1,5 +1,23 @@
 # ToolMate Changelog
 
+## Unreleased
+
+### Added  
+- Added `Settings::embedCacheDuration`, which controls the cache duration for successful video embed responses, and (defaults to `craft\config\GeneralConfig::cacheDuration`)  
+- Added `Settings::embedCacheDurationOnErrors`, which controls the cache duration for unsuccessful video embed responses (default 5 minutes)    
+- Added support for a `cache_duration` parameter for the `ToolmateVariable::getVideoEmbed()` and `getVideoEmbed()` Twig function, which can be used to override the cache duration in Toolmate's settings  
+- Added a boilerplate `config.php` to the plugin repo
+
+### Improvements
+- ToolMate now caches unsuccessful video embed responses separate from successful video embed responses    
+- `Settings::publicRoot` now defaults to the `@webroot` alias, and falls back on `$_SERVER['DOCUMENT_ROOT']`   
+
+### Fixed
+- Fixes an issue where ToolMate would cache video embed request responses for much longer than intended   
+
+### Changed
+- Toolmate now does logging to its own log file `storage/logs/toolmate.log`
+
 ## 1.0.3 - 2021-05-19
 ### Improved  
 - YouTube embeds will always set `rel=0` to prevent YouTube from pulling in "related" videos from other channels when the video ends  

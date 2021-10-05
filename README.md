@@ -24,7 +24,7 @@ ToolMate can be configured by creating a file named `toolmate.php` in your Craft
 and overriding settings as needed. 
 
 ### publicRoot [string]
-*Default: `null`*
+*Default: `@webroot`*
   
 Sets the public webroot that is used by inline and stamp on servers 
 where `$_SERVER['DOCUMENT_ROOT']` and `@webroot` is incorrect.  
@@ -33,6 +33,32 @@ where `$_SERVER['DOCUMENT_ROOT']` and `@webroot` is incorrect.
 *Default: `true`*  
 
 Enables/disables all minifying.
+
+### embedCacheDuration [int|string|bool|null]
+*Default: `null`*
+
+The number of seconds to cache responses from `craft.toolmate.getVideoEmbed()`.  
+
+If set to `null`, the core [`cacheDuration`](https://craftcms.com/docs/3.x/config/config-settings.html#cacheduration) setting is used.
+
+If set to `false` responses are not cached.  
+
+If set to `0`, cached responses will be stored indefinitely.  
+
+See [`craft\helpers\ConfigHelper::durationInSeconds()`](https://docs.craftcms.com/api/v3/craft-helpers-confighelper.html#method-durationinseconds) for a list of supported value types.
+
+### embedCacheDurationOnError [int|string|bool|null]
+*Default: `300` (5 minutes)*
+
+The number of seconds to cache responses from `craft.toolmate.getVideoEmbed()` when there is an error (i.e. a valid embed code could not be returned).  
+
+If set to `null`, the default value (`300`, 5 minutes) is used.  
+
+If set to `false`, error responses are not cached.  
+
+If set to `0`, error response caches will be stored indefinitely.
+
+See [`craft\helpers\ConfigHelper::durationInSeconds()`](https://docs.craftcms.com/api/v3/craft-helpers-confighelper.html#method-durationinseconds) for a list of supported value types.
 
 ---
 

@@ -4,7 +4,9 @@ namespace vaersaagod\toolmate\services;
 
 use Craft;
 use craft\base\Component;
+use craft\helpers\ConfigHelper;
 use craft\helpers\Template;
+use vaersaagod\toolmate\ToolMate;
 
 /**
  * Embed Service
@@ -28,8 +30,40 @@ class EmbedService extends Component
         $isWistia = strpos($videoUrl, 'wistia.com/') !== false;
         $isViddler = strpos($videoUrl, 'viddler.com/') !== false;
 
-        $cacheTimeInMinutes = 10080; // in minutes (default is 1 week)
-        $cacheExpired = false;
+        $settings = ToolMate::getInstance()->getSettings();
+
+        // Check for cache duration override in params
+        if (isset($params['cache_duration'])) {
+            // The "cache_duration" should be the seconds to cache, or a date interval string (e.g. "P1D")
+            // Can be set to `false` to disable caching
+            if ($params['cache_duration'] === false) {
+                $cacheDuration = false;
+                $cacheDurationOnErrors = false;
+            } else if ($params['cache_duration'] === null) {
+                $cacheDuration = Craft::$app->getConfig()->getGeneral()->cacheDuration;
+            } else {
+                $cacheDuration = ConfigHelper::durationInSeconds($params['cache_duration']);
+            }
+        } else if (isset($params['cache_minutes'])) {
+            // Support legacy "cache_minutes" param
+            // Can be set to `false` to disable all caching, or a number representing the number of *minutes* to cache responses
+            if ($params['cache_minutes'] === false) {
+                $cacheDuration = false;
+                $cacheDurationOnErrors = false;
+            } else if ($params['cache_minutes'] === null) {
+                $cacheDuration = Craft::$app->getConfig()->getGeneral()->cacheDuration;
+            } else if (is_numeric($params['cache_minutes'])) {
+                $cacheDuration = floor((float)$params['cache_minutes'] * 60);
+            } else {
+                throw new \Exception("Invalid param value for \"cache_minutes\" - it should be either false (for no caching) or a number (cache minutes)");
+            }
+        }
+
+        $cacheDuration = $cacheDuration ?? $settings->embedCacheDuration;
+        $cacheDurationOnErrors = $cacheDurationOnErrors ?? $settings->embedCacheDurationOnError;
+
+        $doCache = is_int($cacheDuration);
+        $doCacheErrors = $doCache && is_int($cacheDurationOnErrors);
 
         $pluginVars = array(
             'title' => 'title',
@@ -47,7 +81,7 @@ class EmbedService extends Component
             'upload_date' => 'date',
         );
 
-        $videoData = array();
+        $videoData = [];
         foreach ($pluginVars as $var) {
             $videoData[$var] = false;
         }
@@ -72,11 +106,6 @@ class EmbedService extends Component
         $wmode_param = isset($params['wmode']) ? '&wmode=' . $params['wmode'] : '';
         $url .= $maxWidth . $maxHeight . $wmode_param;
 
-        // cache can be disabled by setting 0 as the cache_minutes param
-        if (isset($params['cache_minutes']) && $params['cache_minutes'] !== false && is_numeric($params['cache_minutes'])) {
-            $cacheTimeInMinutes = $params['cache_minutes'];
-        }
-
         // optional provider prefixed parameters
         $providerExtraParams = [];
         if ($isVimeo) {
@@ -100,28 +129,24 @@ class EmbedService extends Component
             $url .= '&' . $this->makeUrlKeyValuePairsString($providerExtraParams);
         }
 
-        // checking if url has been cached
-        $cachedUrl = Craft::$app->cache->get($url);
-
-        if (!$cacheTimeInMinutes || $cacheExpired || !$cachedUrl) {
-            // create the info and header variables
-            list($videoInfo, $videoHeader) = $this->getVideoInfo($url);
-
-            // write the data to cache if caching hasn't been disabled
-            if ($cacheTimeInMinutes) {
-                Craft::$app->cache->set($url, $videoInfo, $cacheTimeInMinutes);
+        // If we're caching, look for the cached URL
+        $rawVideoInfo = $doCache ? Craft::$app->getCache()->get($url) : false;
+        if ($rawVideoInfo === false) {
+            // Get the raw video info from YouTube et al, and parse it
+            list($rawVideoInfo) = $this->getVideoInfo($url);
+            $videoInfo = $this->parseVideoInfo($rawVideoInfo);
+            if ($videoInfo && $doCache) {
+                Craft::$app->getCache()->set($url, $rawVideoInfo, $cacheDuration);
+            } else if (!$videoInfo) {
+                Craft::error("Unable to get video embed for URL {$url}. The raw response was " . json_encode($rawVideoInfo), __METHOD__);
+                if ($doCacheErrors) {
+                    Craft::$app->getCache()->set($url, $rawVideoInfo ?: 'error', $cacheDurationOnErrors);
+                }
             }
-        } else {
-            $videoInfo = $cachedUrl;
         }
 
-        // decode the cURL data
-        libxml_use_internal_errors(true);
-
-        $videoInfo = simplexml_load_string($videoInfo);
-
-        // gracefully fail if the video is not found
-        if ($videoInfo === false) {
+        $videoInfo = $videoInfo ?? $this->parseVideoInfo($rawVideoInfo);
+        if (!$videoInfo) {
             return $videoData;
         }
 
@@ -325,5 +350,29 @@ class EmbedService extends Component
         }
 
         return implode('&', $chunks);
+    }
+
+    /**
+     * @param $rawVideoInfo
+     * @return \SimpleXMLElement|null
+     */
+    private function parseVideoInfo($rawVideoInfo): ?\SimpleXMLElement
+    {
+        if (!$rawVideoInfo || !is_string($rawVideoInfo)) {
+            return null;
+        }
+        $useXmlLibXmlErrors = libxml_use_internal_errors(true);
+        try {
+            $videoInfo = simplexml_load_string($rawVideoInfo);
+        } catch (\Throwable $e) {
+            Craft::error($e->getMessage(), __METHOD__);
+            $videoInfo = null;
+        }
+        libxml_use_internal_errors($useXmlLibXmlErrors);
+        // Check if we have a valid, parsed embed object
+        if (!$videoInfo instanceof \SimpleXMLElement || !isset($videoInfo->html) || !$videoInfo->html) {
+            return null;
+        }
+        return $videoInfo;
     }
 }
