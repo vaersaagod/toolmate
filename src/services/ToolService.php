@@ -5,9 +5,9 @@ namespace vaersaagod\toolmate\services;
 use Craft;
 use craft\base\Component;
 use craft\helpers\FileHelper;
+
 use vaersaagod\toolmate\ToolMate;
-use yii\base\Exception;
-use yii\base\InvalidConfigException;
+
 use yii\web\Cookie;
 
 /**
@@ -23,11 +23,11 @@ class ToolService extends Component
     /**
      * Inlines local or remote file.
      *
-     * @param $fileName
+     * @param string $fileName
      * @param bool $remote
      * @return false|string
      */
-    public function inline($fileName, $remote = false)
+    public function inline(string $fileName, bool $remote = false)
     {
         if ($remote) {
             if (strpos($fileName, '//') === 0) {
@@ -52,12 +52,12 @@ class ToolService extends Component
     /**
      * Stamps a file name or path with timestamp or hash.
      *
-     * @param $fileName
+     * @param string $fileName
      * @param string $mode
      * @param string $type
      * @return string
      */
-    public function stamp($fileName, $mode = 'file', $type = 'ts'): string
+    public function stamp(string $fileName, string $mode = 'file', string $type = 'ts'): string
     {
         $documentRoot = ToolMate::getInstance()->getSettings()->publicRoot;
         $filePath = FileHelper::normalizePath($documentRoot . '/' . $fileName);
@@ -92,11 +92,11 @@ class ToolService extends Component
     }
 
     /**
-     * @param $params
+     * @param array $params
      * @param bool $secure
-     * @throws Exception
+     * @throws \Exception
      */
-    public function setCookie($params, $secure = false)
+    public function setCookie(array $params, bool $secure = false)
     {
         $defaults = [
             'name' => '',
@@ -113,7 +113,7 @@ class ToolService extends Component
         $params = array_merge($defaults, $params);
 
         if ($params['name'] === '') {
-            throw new Exception('Parameter `name` is required for setCookie, mate!', __METHOD__);
+            throw new \Exception('Parameter `name` is required for setCookie, mate!', __METHOD__);
         }
 
         if ($params['value'] === '') {
@@ -129,11 +129,8 @@ class ToolService extends Component
 
             try {
                 $cookie->value = Craft::$app->security->hashData(base64_encode(serialize($params['value'])));
-            } catch (InvalidConfigException $e) {
+            } catch (\Throwable $e) {
                 Craft::error('Error setting secure cookie: ' . $e->getMessage(), __METHOD__);
-                return;
-            } catch (Exception $e) {
-                Craft::error('Error setting secure cookie: ' . $e->getMessage(),__METHOD__);
                 return;
             }
             
@@ -167,11 +164,11 @@ class ToolService extends Component
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @param bool $secure
      * @return mixed|string
      */
-    public function getCookie($name, $secure = false)
+    public function getCookie(string $name, bool $secure = false)
     {
         $result = '';
 
@@ -181,14 +178,11 @@ class ToolService extends Component
             if ($cookie !== null) {
                 try {
                     $data = Craft::$app->security->validateData($cookie->value);
-                } catch (InvalidConfigException $e) {
+                } catch (\Throwable $e) {
                     Craft::error('Error getting secure cookie: ' . $e->getMessage(), __METHOD__);
                     $data = false;
-                } catch (Exception $e) {
-                    Craft::error('Error getting secure cookie: ' . $e->getMessage(),__METHOD__);
-                    $data = false;
                 }
-                
+
                 if ($cookie && !empty($cookie->value) && $data !== false) {
                     $result = unserialize(base64_decode($data), ['allowed_classes' => false]);
                 }
@@ -211,10 +205,10 @@ class ToolService extends Component
      * Exactly like hash_file except that the result is always numeric
      * (consisting of characters 0-9 only).
      *
-     * @param $filePath
+     * @param string $filePath
      * @return string
      */
-    private function numHashFile($filePath): string
+    private function numHashFile(string $filePath): string
     {
         return implode(unpack('C*', hash_file('crc32b', $filePath, true)));
     }

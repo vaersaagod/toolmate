@@ -6,6 +6,7 @@ use Craft;
 use craft\base\Component;
 use craft\helpers\ConfigHelper;
 use craft\helpers\Template;
+
 use vaersaagod\toolmate\ToolMate;
 
 /**
@@ -21,6 +22,7 @@ class EmbedService extends Component
      * @param string $videoUrl
      * @param array $params
      * @return array
+     * @throws \yii\base\InvalidConfigException
      */
     public function getVideoEmbed(string $videoUrl, array $params = []): array
     {
@@ -267,7 +269,7 @@ class EmbedService extends Component
      * @param string $videoUrl The video URL.
      * @return array An array containing the video info (or false) and the response code (or false).
      */
-    public function getVideoInfo($videoUrl): array
+    public function getVideoInfo(string $videoUrl): array
     {
         // do we have curl?
         if (function_exists('curl_init')) {
@@ -307,7 +309,7 @@ class EmbedService extends Component
      * @param string $prefix The prefix that keys should start with in order to be returned.
      * @return array The array of (unprefixed) key => value pairs that matched the specified prefix.
      */
-    private function getPrefixedParams($params = [], $prefix = ''): array
+    private function getPrefixedParams(array $params = [], string $prefix = ''): array
     {
         $prefixedParams = [];
 
@@ -339,7 +341,7 @@ class EmbedService extends Component
      * @param array $pairs An array of key => value pairs
      * @return string The resulting string. Ex: key=value&key2=value2
      */
-    private function makeUrlKeyValuePairsString($pairs = []): string
+    private function makeUrlKeyValuePairsString(array $pairs = []): string
     {
         $chunks = [];
 

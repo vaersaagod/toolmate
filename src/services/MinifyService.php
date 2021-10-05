@@ -3,9 +3,12 @@
 namespace vaersaagod\toolmate\services;
 
 use craft\base\Component;
+
 use MatthiasMullie\Minify\JS;
 use MatthiasMullie\Minify\CSS;
+
 use vaersaagod\toolmate\ToolMate;
+
 use voku\helper\HtmlMin;
 
 /**
@@ -22,7 +25,7 @@ class MinifyService extends Component
      * @param string $content
      * @return string
      */
-    public function minify($content): string
+    public function minify(string $content): string
     {
         // todo : Parse DOM and minify any script or style tags separately?
         return $this->html($content);
@@ -32,7 +35,7 @@ class MinifyService extends Component
      * @param string $content
      * @return string
      */
-    public function css($content): string 
+    public function css(string $content): string
     {
         $settings = ToolMate::$plugin->getSettings();
         
@@ -49,7 +52,7 @@ class MinifyService extends Component
      * @param string $content
      * @return string
      */
-    public function js($content): string 
+    public function js(string $content): string
     {
         $settings = ToolMate::$plugin->getSettings();
         
@@ -66,7 +69,7 @@ class MinifyService extends Component
      * @param string $content
      * @return string
      */
-    public function html($content): string
+    public function html(string $content): string
     {
         $settings = ToolMate::$plugin->getSettings();
         

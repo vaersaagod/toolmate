@@ -20,11 +20,10 @@ class ToolMateVariable
      * Inlines local or remote file.
      *
      * @param string $fileName
-     * @param bool   $remote
-     *
-     * @return string
+     * @param bool $remote
+     * @return false|string
      */
-    public function inline($fileName, $remote = false): string
+    public function inline(string $fileName, bool $remote = false)
     {
         return ToolMate::$plugin->tool->inline($fileName, $remote);
     }
@@ -37,7 +36,7 @@ class ToolMateVariable
      * @param string $type
      * @return string
      */
-    public function stamp($fileName, $mode = 'file', $type = 'ts'): string
+    public function stamp(string $fileName, string $mode = 'file', string $type = 'ts'): string
     {
         return ToolMate::$plugin->tool->stamp($fileName, $mode, $type);
     }
@@ -47,7 +46,7 @@ class ToolMateVariable
      * @param bool $secure
      * @throws \yii\base\Exception
      */
-    public function setCookie($params, $secure = false)
+    public function setCookie(array $params, bool $secure = false): void
     {
         ToolMate::$plugin->tool->setCookie($params, $secure);
     }
@@ -57,17 +56,18 @@ class ToolMateVariable
      * @param bool $secure
      * @return mixed|string
      */
-    public function getCookie($name, $secure = false)
+    public function getCookie(string $name, bool $secure = false)
     {
         return ToolMate::$plugin->tool->getCookie($name, $secure);
     }
 
     /**
-     * @param $url
+     * @param string $url
      * @param array $params
      * @return array
+     * @throws \Exception
      */
-    public function getVideoEmbed($url, $params = []): array
+    public function getVideoEmbed(string $url, array $params = []): array
     {
         return ToolMate::$plugin->embed->getVideoEmbed($url, $params);
     }
