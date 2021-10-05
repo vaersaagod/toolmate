@@ -4,7 +4,7 @@
 
 ### Added  
 - Added `Settings::embedCacheDuration`, which controls the cache duration for successful video embed responses, and (defaults to `craft\config\GeneralConfig::cacheDuration`)  
-- Added `Settings::embedCacheDurationOnErrors`, which controls the cache duration for unsuccessful video embed responses (default 5 minutes)    
+- Added `Settings::embedCacheDurationOnError`, which controls the cache duration for unsuccessful video embed responses (default 5 minutes)    
 - Added support for a `cache_duration` parameter for the `ToolmateVariable::getVideoEmbed()` and `getVideoEmbed()` Twig function, which can be used to override the cache duration in Toolmate's settings  
 - Added a boilerplate `config.php` to the plugin repo
 
