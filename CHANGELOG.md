@@ -1,6 +1,6 @@
 # ToolMate Changelog
 
-## Unreleased
+## 1.1.0 - 2021-10-06
 
 ### Added  
 - Added `Settings::embedCacheDuration`, which controls the cache duration for successful video embed responses, and (defaults to `craft\config\GeneralConfig::cacheDuration`)  
