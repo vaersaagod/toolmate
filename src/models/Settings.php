@@ -4,10 +4,13 @@ namespace vaersaagod\toolmate\models;
 
 use Craft;
 use craft\base\Model;
+use craft\helpers\App;
 use craft\helpers\ConfigHelper;
 
 /**
  * ToolMate Settings Model
+ *
+ * @property-read CspConfig $csp
  *
  * @author    Værsågod
  * @package   ToolMate
@@ -28,16 +31,14 @@ class Settings extends Model
     public $embedCacheDuration = null;
 
     /** @var int|string|bool|null */
-    public $embedCacheDurationOnError = null;
+    public $embedCacheDurationOnError = 300;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @var CspConfig|null
+     * @see getCsp()
+     * @see setCsp()
      */
-    public function init()
-    {
-        parent::init();
-        $this->setAttributes($this->getAttributes(), false);
-    }
+    private $_csp;
 
     /**
      * @param array $values
@@ -47,25 +48,43 @@ class Settings extends Model
     public function setAttributes($values, $safeOnly = true)
     {
 
+        $values['publicRoot'] = App::parseEnv($values['publicRoot'] ?? '@webroot');
+
+        if ($values['embedCacheDuration'] === null) {
+            $values['embedCacheDuration'] = Craft::$app->getConfig()->getGeneral()->cacheDuration;
+        } else if ($values['embedCacheDuration'] !== false) {
+            $values['embedCacheDuration'] = ConfigHelper::durationInSeconds($values['embedCacheDuration']);
+        }
+
+        if (!empty($values['embedCacheDurationOnError'])) {
+            $values['embedCacheDurationOnError'] = ConfigHelper::durationInSeconds($values['embedCacheDurationOnError']);
+        }
+
+        $this->setCsp($values['csp'] ?? []);
+        unset($values['csp']);
+
         parent::setAttributes($values, $safeOnly);
 
-        $this->publicRoot = Craft::parseEnv($this->publicRoot) ?: ($_SERVER['DOCUMENT_ROOT'] ?? '');
+    }
 
-        if ($this->embedCacheDuration !== false) {
-            if ($this->embedCacheDuration !== null) {
-                $this->embedCacheDuration = ConfigHelper::durationInSeconds($this->embedCacheDuration);
-            } else {
-                $this->embedCacheDuration = Craft::$app->getConfig()->getGeneral()->cacheDuration;
-            }
-        }
+    /**
+     * @param array $config
+     * @return void
+     */
+    public function setCsp(array $config = [])
+    {
+        $this->_csp = new CspConfig($config);
+    }
 
-        if ($this->embedCacheDurationOnError !== false) {
-            if ($this->embedCacheDurationOnError !== null) {
-                $this->embedCacheDurationOnError = ConfigHelper::durationInSeconds($this->embedCacheDurationOnError);
-            } else {
-                $this->embedCacheDurationOnError = 300; // 5 minutes
-            }
+    /**
+     * @return CspConfig
+     */
+    public function getCsp(): CspConfig
+    {
+        if (!$this->_csp) {
+            $this->_csp = new CspConfig();
         }
+        return $this->_csp;
     }
 
 }

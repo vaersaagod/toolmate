@@ -1,5 +1,10 @@
 # ToolMate Changelog
 
+## 1.2.0 - 2022-02-13
+### Added
+- Added `Settings::csp` for configuring the Content-Security-Policy header
+- Added the `cspNonce()` Twig function for outputting a CSP nonce attribute or value
+
 ## 1.1.0 - 2021-10-06
 
 ### Added  
