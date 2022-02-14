@@ -4,8 +4,8 @@ namespace vaersaagod\toolmate\models;
 
 use Craft;
 use craft\base\Model;
-use craft\helpers\App;
 use craft\helpers\ConfigHelper;
+
 
 /**
  * ToolMate Settings Model
@@ -41,6 +41,15 @@ class Settings extends Model
     private $_csp;
 
     /**
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function init()
+    {
+        parent::init();
+        $this->setAttributes($this->getAttributes(), false);
+    }
+
+    /**
      * @param array $values
      * @param bool $safeOnly
      * @throws \yii\base\InvalidConfigException
@@ -48,7 +57,7 @@ class Settings extends Model
     public function setAttributes($values, $safeOnly = true)
     {
 
-        $values['publicRoot'] = App::parseEnv($values['publicRoot'] ?? '@webroot');
+        $values['publicRoot'] = Craft::parseEnv($values['publicRoot'] ?? '@webroot');
 
         if ($values['embedCacheDuration'] === null) {
             $values['embedCacheDuration'] = Craft::$app->getConfig()->getGeneral()->cacheDuration;

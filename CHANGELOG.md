@@ -1,5 +1,9 @@
 # ToolMate Changelog
 
+## 1.2.0.1 - 2022-02-14
+### Fixed
+- Fixes an issue where Toolmate wasn't able to set the public web root path correctly
+
 ## 1.2.0 - 2022-02-13
 ### Added
 - Added `Settings::csp` for configuring the Content-Security-Policy header
