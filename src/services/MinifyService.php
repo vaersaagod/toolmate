@@ -4,8 +4,8 @@ namespace vaersaagod\toolmate\services;
 
 use craft\base\Component;
 
-use MatthiasMullie\Minify\JS;
 use MatthiasMullie\Minify\CSS;
+use MatthiasMullie\Minify\JS;
 
 use vaersaagod\toolmate\ToolMate;
 
@@ -20,7 +20,6 @@ use voku\helper\HtmlMin;
  */
 class MinifyService extends Component
 {
-
     /**
      * @param string $content
      * @return string

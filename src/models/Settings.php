@@ -6,7 +6,6 @@ use Craft;
 use craft\base\Model;
 use craft\helpers\ConfigHelper;
 
-
 /**
  * ToolMate Settings Model
  *
@@ -56,12 +55,11 @@ class Settings extends Model
      */
     public function setAttributes($values, $safeOnly = true)
     {
-
         $values['publicRoot'] = Craft::parseEnv($values['publicRoot'] ?? '@webroot');
 
         if ($values['embedCacheDuration'] === null) {
             $values['embedCacheDuration'] = Craft::$app->getConfig()->getGeneral()->cacheDuration;
-        } else if ($values['embedCacheDuration'] !== false) {
+        } elseif ($values['embedCacheDuration'] !== false) {
             $values['embedCacheDuration'] = ConfigHelper::durationInSeconds($values['embedCacheDuration']);
         }
 
@@ -73,7 +71,6 @@ class Settings extends Model
         unset($values['csp']);
 
         parent::setAttributes($values, $safeOnly);
-
     }
 
     /**
@@ -95,5 +92,4 @@ class Settings extends Model
         }
         return $this->_csp;
     }
-
 }

@@ -13,7 +13,6 @@ use craft\base\Model;
  */
 class CspDirectives extends Model
 {
-
     /** @var string[] */
     public $defaultSrc = [];
 
@@ -70,5 +69,4 @@ class CspDirectives extends Model
 
     /** @var string[] */
     public $navigateTo = [];
-
 }

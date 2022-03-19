@@ -2,8 +2,8 @@
 
 namespace vaersaagod\toolmate\variables;
 
-use yii\base\Exception;
 use vaersaagod\toolmate\ToolMate;
+use yii\base\Exception;
 
 /**
  * ToolMate Variable
@@ -55,5 +55,4 @@ class ToolMateVariable
     {
         return ToolMate::$plugin->embed->getVideoEmbed($url, $params);
     }
-
 }

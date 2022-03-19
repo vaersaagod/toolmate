@@ -41,20 +41,20 @@ class EmbedService extends Component
             if ($params['cache_duration'] === false) {
                 $cacheDuration = false;
                 $cacheDurationOnErrors = false;
-            } else if ($params['cache_duration'] === null) {
+            } elseif ($params['cache_duration'] === null) {
                 $cacheDuration = Craft::$app->getConfig()->getGeneral()->cacheDuration;
             } else {
                 $cacheDuration = ConfigHelper::durationInSeconds($params['cache_duration']);
             }
-        } else if (isset($params['cache_minutes'])) {
+        } elseif (isset($params['cache_minutes'])) {
             // Support legacy "cache_minutes" param
             // Can be set to `false` to disable all caching, or a number representing the number of *minutes* to cache responses
             if ($params['cache_minutes'] === false) {
                 $cacheDuration = false;
                 $cacheDurationOnErrors = false;
-            } else if ($params['cache_minutes'] === null) {
+            } elseif ($params['cache_minutes'] === null) {
                 $cacheDuration = Craft::$app->getConfig()->getGeneral()->cacheDuration;
-            } else if (is_numeric($params['cache_minutes'])) {
+            } elseif (is_numeric($params['cache_minutes'])) {
                 $cacheDuration = floor((float)$params['cache_minutes'] * 60);
             } else {
                 throw new \Exception("Invalid param value for \"cache_minutes\" - it should be either false (for no caching) or a number (cache minutes)");
@@ -78,7 +78,7 @@ class EmbedService extends Component
             'medres_url' => 'posterMediumRes',
             'highres_url' => 'posterHighRes',
             'width' => 'width',
-            'height' =>  'height',
+            'height' => 'height',
             'provider_name' => 'provider',
             'upload_date' => 'date',
         );
@@ -91,11 +91,11 @@ class EmbedService extends Component
         // if it's not YouTube, Vimeo, Wistia, or Viddler bail
         if ($isYouTube) {
             $url = 'https://www.youtube.com/oembed?format=xml&iframe=1&scheme=https&rel=0&url=';
-        } else if ($isVimeo) {
+        } elseif ($isVimeo) {
             $url = 'https://vimeo.com/api/oembed.xml?url=';
-        } else if ($isWistia) {
+        } elseif ($isWistia) {
             $url = 'https://app.wistia.com/embed/oembed.xml?url=';
-        } else if ($isViddler) {
+        } elseif ($isViddler) {
             $url = 'https://www.viddler.com/oembed/?format=xml&url=';
         } else {
             return $videoData;
@@ -112,7 +112,7 @@ class EmbedService extends Component
         $providerExtraParams = [];
         if ($isVimeo) {
             $providerExtraParams = $this->getPrefixedParams($params, 'vimeo_');
-        } else if ($isWistia) {
+        } elseif ($isWistia) {
             $providerExtraParams = $this->getPrefixedParams($params, 'wistia_');
 
             // handle legacy shortcuts
@@ -124,7 +124,7 @@ class EmbedService extends Component
                 $providerExtraParams['videoFoam'] = $providerExtraParams['foam'];
                 unset($providerExtraParams['foam']);
             }
-        } else if ($isViddler) {
+        } elseif ($isViddler) {
             $providerExtraParams = $this->getPrefixedParams($params, 'viddler_');
         }
         if (!empty($providerExtraParams)) {
@@ -139,7 +139,7 @@ class EmbedService extends Component
             $videoInfo = $this->parseVideoInfo($rawVideoInfo);
             if ($videoInfo && $doCache) {
                 Craft::$app->getCache()->set($url, $rawVideoInfo, $cacheDuration);
-            } else if (!$videoInfo) {
+            } elseif (!$videoInfo) {
                 Craft::error("Unable to get video embed for URL {$url}. The raw response was " . json_encode($rawVideoInfo), __METHOD__);
                 if ($doCacheErrors) {
                     Craft::$app->getCache()->set($url, $rawVideoInfo ?: 'error', $cacheDurationOnErrors);
@@ -201,7 +201,7 @@ class EmbedService extends Component
         $id = '';
         if (!empty($params['vimeo_player_id'])) {
             $id = $params['vimeo_player_id'];
-        } else if (!empty($params['id'])) {
+        } elseif (!empty($params['id'])) {
             $id = $params['id'];
         }
         if (!empty($id)) {
@@ -223,15 +223,15 @@ class EmbedService extends Component
             $videoInfo->highres_url = str_replace('hqdefault', 'maxresdefault', $videoInfo->thumbnail_url);
             $videoInfo->medres_url = $videoInfo->thumbnail_url;
             $videoInfo->thumbnail_url = str_replace('hqdefault', 'mqdefault', $videoInfo->thumbnail_url);
-        } else if ($isVimeo) {
+        } elseif ($isVimeo) {
             $videoInfo->highres_url = preg_replace('/_(.*?)\./', '_1280.', $videoInfo->thumbnail_url);
             $videoInfo->medres_url = preg_replace('/_(.*?)\./', '_640.', $videoInfo->thumbnail_url);
             $videoInfo->thumbnail_url = preg_replace('/_(.*?)\./', '_295.', $videoInfo->thumbnail_url);
-        } else if ($isWistia) {
+        } elseif ($isWistia) {
             $videoInfo->highres_url = str_replace('?image_crop_resized=100x60', '', $videoInfo->thumbnail_url);
             $videoInfo->medres_url = str_replace('?image_crop_resized=100x60', '?image_crop_resized=640x400', $videoInfo->thumbnail_url);
             $videoInfo->thumbnail_url = str_replace('?image_crop_resized=100x60', '?image_crop_resized=240x135', $videoInfo->thumbnail_url);
-        } else if ($isViddler) {
+        } elseif ($isViddler) {
             $videoInfo->highres_url = $videoInfo->thumbnail_url;
             $videoInfo->medres_url = $videoInfo->thumbnail_url;
             $videoInfo->thumbnail_url = str_replace('thumbnail_2', 'thumbnail_1', $videoInfo->thumbnail_url);
@@ -280,7 +280,7 @@ class EmbedService extends Component
                 CURLOPT_URL => $videoUrl,
                 CURLOPT_RETURNTRANSFER => 1,
                 CURLOPT_CONNECTTIMEOUT => 10,
-                CURLOPT_SSL_VERIFYPEER => false //no ssl verification
+                CURLOPT_SSL_VERIFYPEER => false, //no ssl verification
             );
 
             curl_setopt_array($curl, $options);
@@ -290,7 +290,6 @@ class EmbedService extends Component
 
             // close the request
             curl_close($curl);
-
         } // do we have fopen?
         elseif (ini_get('allow_url_fopen') === true) {
             $videoHeader = ($videoInfo = file_get_contents($videoUrl)) ? '200' : true;

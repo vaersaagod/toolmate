@@ -15,7 +15,6 @@ use vaersaagod\toolmate\ToolMate;
  */
 class CspTwigExtension extends AbstractExtension
 {
-
     /**
      * Returns the name of the extension.
      *
@@ -61,5 +60,4 @@ class CspTwigExtension extends AbstractExtension
         }
         return $nonce;
     }
-
 }

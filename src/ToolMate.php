@@ -10,14 +10,14 @@ use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 
 use craft\web\View;
+use vaersaagod\toolmate\models\Settings;
 use vaersaagod\toolmate\services\CspService;
 use vaersaagod\toolmate\services\EmbedService;
 use vaersaagod\toolmate\services\MinifyService;
 use vaersaagod\toolmate\services\ToolService;
 use vaersaagod\toolmate\twigextensions\CspTwigExtension;
-use vaersaagod\toolmate\variables\ToolMateVariable;
 use vaersaagod\toolmate\twigextensions\ToolMateTwigExtension;
-use vaersaagod\toolmate\models\Settings;
+use vaersaagod\toolmate\variables\ToolMateVariable;
 
 use yii\base\Event;
 
@@ -71,7 +71,7 @@ class ToolMate extends Plugin
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
-            static function (Event $event) {
+            static function(Event $event) {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('toolmate', ToolMateVariable::class);
@@ -93,7 +93,6 @@ class ToolMate extends Plugin
          * Maybe send a Content-Security-Policy header
          */
         $this->maybeSendCspHeader();
-
     }
 
     // Protected Methods
@@ -109,7 +108,6 @@ class ToolMate extends Plugin
 
     protected function maybeSendCspHeader()
     {
-
         $cspConfig = ToolMate::getInstance()->getSettings()->csp;
 
         if (!$cspConfig->enabled) {
@@ -124,7 +122,7 @@ class ToolMate extends Plugin
         Event::on(
             View::class,
             View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
-            static function (TemplateEvent $event) {
+            static function(TemplateEvent $event) {
                 \preg_match_all('/nonce="([^"]*)"/', $event->output, $matches);
                 $hashedNonces = $matches[1] ?? [];
                 for ($i = 0; $i < \count($hashedNonces); $i += 1) {
@@ -143,10 +141,9 @@ class ToolMate extends Plugin
         Event::on(
             Application::class,
             \yii\base\Application::EVENT_AFTER_REQUEST,
-            static function (Event $event) {
+            static function(Event $event) {
                 ToolMate::getInstance()->csp->setHeader();
             }
         );
-
     }
 }

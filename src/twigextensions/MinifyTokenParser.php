@@ -3,7 +3,6 @@
 namespace vaersaagod\toolmate\twigextensions;
 
 use Twig\Token;
-use vaersaagod\toolmate\twigextensions\MinifyNode;
 use Twig\TokenParser\AbstractTokenParser;
 
 /**

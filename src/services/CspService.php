@@ -18,7 +18,6 @@ use vaersaagod\toolmate\ToolMate;
  */
 class CspService extends Component
 {
-
     /** @var array */
     private $nonces = [];
 
@@ -49,7 +48,6 @@ class CspService extends Component
      */
     public function setHeader()
     {
-
         $config = ToolMate::getInstance()->getSettings()->csp;
 
         // Get directives
@@ -62,14 +60,14 @@ class CspService extends Component
             if ($currentUser instanceof User && $currentUser->getPreference('enableDebugToolbarForSite')) {
                 $directivesConfig->scriptSrc[] = "'unsafe-inline' 'unsafe-eval'";
             }
-        } else if (Craft::$app->getRequest()->getIsCpRequest()) {
+        } elseif (Craft::$app->getRequest()->getIsCpRequest()) {
             $directivesConfig->frameAncestors[] = "'self'";
             $directivesConfig->scriptSrc[] = "'unsafe-inline' 'unsafe-eval'";
         }
 
         // Convert directive names to kebab-case, remove duplicates, etc
         $directivesArray = $config->getDirectives()->toArray();
-        $directives = \array_reduce(\array_keys($directivesArray), function (array $carry, string $field) use ($directivesArray) {
+        $directives = \array_reduce(\array_keys($directivesArray), function(array $carry, string $field) use ($directivesArray) {
             $policy = \array_filter(\explode(' ', \implode(' ', $directivesArray[$field])));
             if (empty($policy)) {
                 return $carry;
@@ -106,7 +104,5 @@ class CspService extends Component
         }
 
         Craft::$app->getResponse()->getHeaders()->set('Content-Security-Policy', $csp);
-
     }
-
 }

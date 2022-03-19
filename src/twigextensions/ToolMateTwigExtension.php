@@ -7,7 +7,6 @@ use Twig\TwigFunction;
 
 use vaersaagod\toolmate\ToolMate;
 
-
 /**
  * @author    Værsågod
  * @package   ToolMate

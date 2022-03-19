@@ -13,7 +13,6 @@ use craft\base\Model;
  */
 class CspConfig extends Model
 {
-
     /** @var bool */
     public $enabled = false;
 
@@ -54,5 +53,4 @@ class CspConfig extends Model
         }
         return $this->_directives;
     }
-
 }

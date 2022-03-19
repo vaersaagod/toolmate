@@ -19,7 +19,6 @@ use yii\web\Cookie;
  */
 class ToolService extends Component
 {
-
     /**
      * Inlines local or remote file.
      *
@@ -153,7 +152,7 @@ class ToolService extends Component
                     'domain' => $params['domain'],
                     'secure' => true,
                     'httponly' => $params['httpOnly'],
-                    'samesite' => $params['sameSite']
+                    'samesite' => $params['sameSite'],
                 ]);
             } else {
                 setcookie($params['name'], $params['value'], $params['expire'], $params['path'], $params['domain'], $params['secure'], $params['httpOnly']);

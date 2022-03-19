@@ -3,8 +3,8 @@
 namespace vaersaagod\toolmate\twigextensions;
 
 use Twig\Compiler;
-use vaersaagod\toolmate\ToolMate;
 use Twig\Node\Node;
+use vaersaagod\toolmate\ToolMate;
 
 /**
  * @author    Værsågod
@@ -13,7 +13,6 @@ use Twig\Node\Node;
  */
 class MinifyNode extends Node
 {
-
     // Public Methods
     // =========================================================================
 
@@ -38,7 +37,7 @@ class MinifyNode extends Node
         if ($html) {
             $compiler
                 ->write('echo ' . ToolMate::class . "::\$plugin->minify->html(\$_compiledBody);\n");
-        } else if ($css) {
+        } elseif ($css) {
             $compiler
                 ->write('echo ' . ToolMate::class . "::\$plugin->minify->css(\$_compiledBody);\n");
         } elseif ($js) {
