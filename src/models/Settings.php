@@ -4,7 +4,9 @@ namespace vaersaagod\toolmate\models;
 
 use Craft;
 use craft\base\Model;
+use craft\helpers\App;
 use craft\helpers\ConfigHelper;
+use yii\base\InvalidConfigException;
 
 /**
  * ToolMate Settings Model
@@ -21,28 +23,28 @@ class Settings extends Model
     // =========================================================================
 
     /** @var string */
-    public $publicRoot = '@webroot';
+    public string $publicRoot = '@webroot';
 
     /** @var bool */
-    public $enableMinify = true;
+    public bool $enableMinify = true;
 
     /** @var int|string|bool|null */
-    public $embedCacheDuration = null;
+    public string|int|bool|null $embedCacheDuration = null;
 
     /** @var int|string|bool|null */
-    public $embedCacheDurationOnError = 300;
+    public string|int|bool|null $embedCacheDurationOnError = 300;
 
     /**
      * @var CspConfig|null
      * @see getCsp()
      * @see setCsp()
      */
-    private $_csp;
+    private ?CspConfig $_csp;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
         $this->setAttributes($this->getAttributes(), false);
@@ -51,11 +53,11 @@ class Settings extends Model
     /**
      * @param array $values
      * @param bool $safeOnly
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
-    public function setAttributes($values, $safeOnly = true)
+    public function setAttributes($values, $safeOnly = true): void
     {
-        $values['publicRoot'] = Craft::parseEnv($values['publicRoot'] ?? '@webroot');
+        $values['publicRoot'] = App::parseEnv($values['publicRoot'] ?? '@webroot');
 
         if ($values['embedCacheDuration'] === null) {
             $values['embedCacheDuration'] = Craft::$app->getConfig()->getGeneral()->cacheDuration;
@@ -77,7 +79,7 @@ class Settings extends Model
      * @param array $config
      * @return void
      */
-    public function setCsp(array $config = [])
+    public function setCsp(array $config = []): void
     {
         $this->_csp = new CspConfig($config);
     }

@@ -26,10 +26,10 @@ class ToolService extends Component
      * @param bool $remote
      * @return false|string
      */
-    public function inline(string $fileName, bool $remote = false)
+    public function inline(string $fileName, bool $remote = false): bool|string
     {
         if ($remote) {
-            if (strpos($fileName, '//') === 0) {
+            if (str_starts_with($fileName, '//')) {
                 $protocol = Craft::$app->getRequest()->isSecureConnection ? 'https:' : 'http:';
                 $fileName = $protocol . $fileName;
             }
@@ -37,7 +37,7 @@ class ToolService extends Component
             return @file_get_contents($fileName);
         }
 
-        $documentRoot = ToolMate::getInstance()->getSettings()->publicRoot;
+        $documentRoot = ToolMate::getInstance()?->getSettings()->publicRoot;
         $filePath = FileHelper::normalizePath($documentRoot . '/' . $fileName);
 
         if ($fileName !== '' && file_exists($filePath)) {
@@ -58,7 +58,7 @@ class ToolService extends Component
      */
     public function stamp(string $fileName, string $mode = 'file', string $type = 'ts'): string
     {
-        $documentRoot = ToolMate::getInstance()->getSettings()->publicRoot;
+        $documentRoot = ToolMate::getInstance()?->getSettings()->publicRoot;
         $filePath = FileHelper::normalizePath($documentRoot . '/' . $fileName);
 
         if ($fileName === '' || !file_exists($filePath)) {
@@ -95,7 +95,7 @@ class ToolService extends Component
      * @param bool $secure
      * @throws \Exception
      */
-    public function setCookie(array $params, bool $secure = false)
+    public function setCookie(array $params, bool $secure = false): void
     {
         $defaults = [
             'name' => '',
@@ -167,7 +167,7 @@ class ToolService extends Component
      * @param bool $secure
      * @return mixed|string
      */
-    public function getCookie(string $name, bool $secure = false)
+    public function getCookie(string $name, bool $secure = false): mixed
     {
         $result = '';
 
@@ -186,10 +186,8 @@ class ToolService extends Component
                     $result = unserialize(base64_decode($data), ['allowed_classes' => false]);
                 }
             }
-        } else {
-            if (isset($_COOKIE[$name])) {
-                $result = $_COOKIE[$name];
-            }
+        } else if (isset($_COOKIE[$name])) {
+            $result = $_COOKIE[$name];
         }
         
         return $result;

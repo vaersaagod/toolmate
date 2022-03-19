@@ -17,7 +17,7 @@ class MinifyTokenParser extends AbstractTokenParser
     // Public Methods
     // =========================================================================
 
-    public function parse(Token $token)
+    public function parse(Token $token): MinifyNode
     {
         $lineNo = $token->getLine();
         $stream = $this->parser->getStream();

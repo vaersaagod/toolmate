@@ -8,6 +8,7 @@ use craft\helpers\ConfigHelper;
 use craft\helpers\Template;
 
 use vaersaagod\toolmate\ToolMate;
+use yii\base\InvalidConfigException;
 
 /**
  * Embed Service
@@ -22,17 +23,17 @@ class EmbedService extends Component
      * @param string $videoUrl
      * @param array $params
      * @return array
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function getVideoEmbed(string $videoUrl, array $params = []): array
     {
         //is this a YouTube URL?
-        $isYouTube = strpos($videoUrl, 'youtube.com/') !== false || strpos($videoUrl, 'youtu.be/') !== false;
-        $isVimeo = strpos($videoUrl, 'vimeo.com/') !== false;
-        $isWistia = strpos($videoUrl, 'wistia.com/') !== false;
-        $isViddler = strpos($videoUrl, 'viddler.com/') !== false;
+        $isYouTube = str_contains($videoUrl, 'youtube.com/') || str_contains($videoUrl, 'youtu.be/');
+        $isVimeo = str_contains($videoUrl, 'vimeo.com/');
+        $isWistia = str_contains($videoUrl, 'wistia.com/');
+        $isViddler = str_contains($videoUrl, 'viddler.com/');
 
-        $settings = ToolMate::getInstance()->getSettings();
+        $settings = ToolMate::getInstance()?->getSettings();
 
         // Check for cache duration override in params
         if (isset($params['cache_duration'])) {
@@ -135,7 +136,7 @@ class EmbedService extends Component
         $rawVideoInfo = $doCache ? Craft::$app->getCache()->get($url) : false;
         if ($rawVideoInfo === false) {
             // Get the raw video info from YouTube et al, and parse it
-            list($rawVideoInfo) = $this->getVideoInfo($url);
+            [$rawVideoInfo] = $this->getVideoInfo($url);
             $videoInfo = $this->parseVideoInfo($rawVideoInfo);
             if ($videoInfo && $doCache) {
                 Craft::$app->getCache()->set($url, $rawVideoInfo, $cacheDuration);
@@ -159,7 +160,7 @@ class EmbedService extends Component
             $embed_str = ' wmode="' . $wmode . '" ';
 
             // determine whether we are dealing with iframe or embed and handle accordingly
-            if (strpos($videoInfo->html, '<iframe') === false) {
+            if (!str_contains($videoInfo->html, '<iframe')) {
                 $param_pos = strpos($videoInfo->html, '<embed');
                 $videoInfo->html = substr($videoInfo->html, 0, $param_pos) . $param_str . substr($videoInfo->html, $param_pos);
                 $param_pos = strpos($videoInfo->html, '<embed') + 6;
@@ -167,7 +168,7 @@ class EmbedService extends Component
             } else {
                 // determine whether to add question mark to query string
                 preg_match('/<iframe.*?src="(.*?)".*?<\/iframe>/i', $videoInfo->html, $matches);
-                $append_query_marker = (strpos($matches[1], '?') !== false ? '' : '?');
+                $append_query_marker = (str_contains($matches[1], '?') ? '' : '?');
 
                 $videoInfo->html = preg_replace('/<iframe(.*?)src="(.*?)"(.*?)<\/iframe>/i', '<iframe$1src="$2' . $append_query_marker . '&wmode=' . $wmode . '"$3</iframe>', $videoInfo->html);
             }
@@ -318,7 +319,7 @@ class EmbedService extends Component
 
         foreach ($params as $key => $value) {
             // if this param doesn't start with the prefix then continue the loop
-            if (strpos($key, $prefix) !== 0) {
+            if (!str_starts_with($key, $prefix)) {
                 continue;
             }
 

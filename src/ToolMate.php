@@ -5,7 +5,6 @@ namespace vaersaagod\toolmate;
 use Craft;
 use craft\base\Plugin;
 use craft\events\TemplateEvent;
-use craft\log\FileTarget;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 
@@ -20,6 +19,7 @@ use vaersaagod\toolmate\twigextensions\ToolMateTwigExtension;
 use vaersaagod\toolmate\variables\ToolMateVariable;
 
 use yii\base\Event;
+use yii\log\FileTarget;
 
 /**
  * @author    Værsågod
@@ -40,7 +40,7 @@ class ToolMate extends Plugin
     /**
      * @var ToolMate
      */
-    public static $plugin;
+    public static ToolMate $plugin;
 
     // Public Properties
     // =========================================================================
@@ -48,12 +48,12 @@ class ToolMate extends Plugin
     /**
      * @var string
      */
-    public $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.0.0';
 
     // Public Methods
     // =========================================================================
 
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -106,15 +106,15 @@ class ToolMate extends Plugin
         return new Settings();
     }
 
-    protected function maybeSendCspHeader()
+    protected function maybeSendCspHeader(): void
     {
-        $cspConfig = ToolMate::getInstance()->getSettings()->csp;
+        $cspConfig = self::getInstance()?->getSettings()->csp;
 
         if (!$cspConfig->enabled) {
             return;
         }
 
-        if (Craft::$app->getRequest()->getIsCpRequest() && !$cspConfig->enabledForCp) {
+        if (!$cspConfig->enabledForCp && Craft::$app->getRequest()->getIsCpRequest()) {
             return;
         }
 
@@ -125,7 +125,7 @@ class ToolMate extends Plugin
             static function(TemplateEvent $event) {
                 \preg_match_all('/nonce="([^"]*)"/', $event->output, $matches);
                 $hashedNonces = $matches[1] ?? [];
-                for ($i = 0; $i < \count($hashedNonces); $i += 1) {
+                for ($i = 0, $iMax = \count($hashedNonces); $i < $iMax; ++$i) {
                     if (!$unhashedNonce = Craft::$app->getSecurity()->validateData($hashedNonces[$i])) {
                         continue;
                     }

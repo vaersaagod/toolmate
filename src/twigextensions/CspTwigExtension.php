@@ -41,9 +41,9 @@ class CspTwigExtension extends AbstractExtension
      * @param bool $hash Whether the nonce should be hashed. Hashed nonces survive `{% cache %}` tags, unhashed nonces do not.
      * @return string|bool
      */
-    public function cspNonceFunction(string $directive, bool $asAttribute = false, bool $hash = true)
+    public function cspNonceFunction(string $directive, bool $asAttribute = false, bool $hash = true): bool|string
     {
-        if (!ToolMate::getInstance()->getSettings()->csp->enabled) {
+        if (!ToolMate::getInstance()?->getSettings()->csp->enabled) {
             return false;
         }
         try {

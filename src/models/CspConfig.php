@@ -14,23 +14,23 @@ use craft\base\Model;
 class CspConfig extends Model
 {
     /** @var bool */
-    public $enabled = false;
+    public bool $enabled = false;
 
     /** @var bool */
-    public $enabledForCp = false;
+    public bool $enabledForCp = false;
 
     /** @var bool */
-    public $reportOnly = false;
+    public bool $reportOnly = false;
 
     /**
      * @var CspDirectives|null
      * @see getDirectives()
      * @see setDirectives()
      */
-    private $_directives;
+    private ?CspDirectives $_directives;
 
     /** @inheritdoc */
-    public function setAttributes($values, $safeOnly = true)
+    public function setAttributes($values, $safeOnly = true): void
     {
         $this->setDirectives($values['directives'] ?? []);
         unset($values['directives']);
@@ -38,10 +38,11 @@ class CspConfig extends Model
     }
 
     /**
-     * @param array $directives
+     * @param array $config
+     *
      * @return void
      */
-    public function setDirectives(array $config = [])
+    public function setDirectives(array $config = []): void
     {
         $this->_directives = new CspDirectives($config);
     }

@@ -19,7 +19,7 @@ use vaersaagod\toolmate\ToolMate;
 class CspService extends Component
 {
     /** @var array */
-    private $nonces = [];
+    private array $nonces = [];
 
     /**
      * @param string $directive
@@ -40,15 +40,15 @@ class CspService extends Component
      */
     public function hasNonce(string $directive, string $nonce): bool
     {
-        return \in_array($nonce, ($this->nonces[$directive] ?? []));
+        return \in_array($nonce, ($this->nonces[$directive] ?? []), true);
     }
 
     /**
      * @return void
      */
-    public function setHeader()
+    public function setHeader(): void
     {
-        $config = ToolMate::getInstance()->getSettings()->csp;
+        $config = ToolMate::getInstance()?->getSettings()->csp;
 
         // Get directives
         $directivesConfig = $config->getDirectives();
@@ -67,7 +67,7 @@ class CspService extends Component
 
         // Convert directive names to kebab-case, remove duplicates, etc
         $directivesArray = $config->getDirectives()->toArray();
-        $directives = \array_reduce(\array_keys($directivesArray), function(array $carry, string $field) use ($directivesArray) {
+        $directives = \array_reduce(\array_keys($directivesArray), static function(array $carry, string $field) use ($directivesArray) {
             $policy = \array_filter(\explode(' ', \implode(' ', $directivesArray[$field])));
             if (empty($policy)) {
                 return $carry;
@@ -80,7 +80,7 @@ class CspService extends Component
         foreach ($this->nonces as $directive => $nonces) {
             $directives[$directive] = $directives[$directive] ?? [];
             foreach ($nonces as $nonce) {
-                if (\in_array("'unsafe-inline'", $directives[$directive])) {
+                if (\in_array("'unsafe-inline'", $directives[$directive], true)) {
                     // Skip nonces for directives with unsafe-inline
                     continue;
                 }
@@ -93,10 +93,10 @@ class CspService extends Component
 
         $cspValues = [];
         foreach ($directives as $directive => $policies) {
-            $cspValues[] = $directive . ' ' . \join(' ', $policies);
+            $cspValues[] = $directive . ' ' . \implode(' ', $policies);
         }
 
-        $csp = \join('; ', $cspValues) . ';';
+        $csp = \implode('; ', $cspValues) . ';';
 
         if ($config->reportOnly) {
             Craft::$app->getResponse()->getHeaders()->set('Content-Security-Policy-Report-Only', $csp);

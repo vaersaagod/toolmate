@@ -19,7 +19,7 @@ class MinifyNode extends Node
     /**
      * @param Compiler $compiler
      */
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $html = $this->getAttribute('html');
         $css = $this->getAttribute('css');

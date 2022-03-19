@@ -3,7 +3,6 @@
 namespace vaersaagod\toolmate\variables;
 
 use vaersaagod\toolmate\ToolMate;
-use yii\base\Exception;
 
 /**
  * ToolMate Variable
@@ -33,7 +32,7 @@ class ToolMateVariable
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function setCookie(array $params, bool $secure = false): void
     {
@@ -43,7 +42,7 @@ class ToolMateVariable
     /**
      * @return mixed|string
      */
-    public function getCookie(string $name, bool $secure = false)
+    public function getCookie(string $name, bool $secure = false): mixed
     {
         return ToolMate::$plugin->tool->getCookie($name, $secure);
     }

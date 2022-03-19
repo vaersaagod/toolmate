@@ -76,7 +76,6 @@ class MinifyService extends Component
             return $content;
         }
 
-        $htmlMin = new HtmlMin();
-        return $htmlMin->minify($content);
+        return (new HtmlMin())->minify($content);
     }
 }

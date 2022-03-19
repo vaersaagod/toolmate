@@ -14,59 +14,59 @@ use craft\base\Model;
 class CspDirectives extends Model
 {
     /** @var string[] */
-    public $defaultSrc = [];
+    public array $defaultSrc = [];
 
     /** @var string[] */
-    public $scriptSrc = [];
+    public array $scriptSrc = [];
 
     /** @var string[] */
-    public $styleSrc = [];
+    public array $styleSrc = [];
 
     /** @var string[] */
-    public $imgSrc = [];
+    public array $imgSrc = [];
 
     /** @var string[] */
-    public $frameSrc = [];
+    public array $frameSrc = [];
 
     /** @var string[] */
-    public $frameAncestors = [];
+    public array $frameAncestors = [];
 
     /** @var string[] */
-    public $baseUri = [];
+    public array $baseUri = [];
 
     /** @var string[] */
-    public $connectSrc = [];
+    public array $connectSrc = [];
 
     /** @var string[] */
-    public $fontSrc = [];
+    public array $fontSrc = [];
 
     /** @var string[] */
-    public $objectSrc = [];
+    public array $objectSrc = [];
 
     /** @var string[] */
-    public $mediaSrc = [];
+    public array $mediaSrc = [];
 
     /** @var string[] */
-    public $sandbox = [];
+    public array $sandbox = [];
 
     /** @var string[] */
-    public $reportUri = [];
+    public array $reportUri = [];
 
     /** @var string[] */
-    public $childSrc = [];
+    public array $childSrc = [];
 
     /** @var string[] */
-    public $formAction = [];
+    public array $formAction = [];
 
     /** @var string[] */
-    public $reportTo = [];
+    public array $reportTo = [];
 
     /** @var string[] */
-    public $workerSrc = [];
+    public array $workerSrc = [];
 
     /** @var string[] */
-    public $manifestSrc = [];
+    public array $manifestSrc = [];
 
     /** @var string[] */
-    public $navigateTo = [];
+    public array $navigateTo = [];
 }
