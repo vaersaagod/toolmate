@@ -2,6 +2,7 @@
 
 namespace vaersaagod\toolmate\variables;
 
+use yii\base\Exception;
 use vaersaagod\toolmate\ToolMate;
 
 /**
@@ -15,26 +16,16 @@ class ToolMateVariable
 {
     // Public Methods
     // =========================================================================
-
     /**
      * Inlines local or remote file.
-     *
-     * @param string $fileName
-     * @param bool $remote
-     * @return false|string
      */
-    public function inline(string $fileName, bool $remote = false)
+    public function inline(string $fileName, bool $remote = false): string|false
     {
         return ToolMate::$plugin->tool->inline($fileName, $remote);
     }
 
     /**
      * Stamps a file name or path with timestamp or hash.
-     *
-     * @param string $fileName
-     * @param string $mode
-     * @param string $type
-     * @return string
      */
     public function stamp(string $fileName, string $mode = 'file', string $type = 'ts'): string
     {
@@ -42,9 +33,7 @@ class ToolMateVariable
     }
 
     /**
-     * @param array $params
-     * @param bool $secure
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function setCookie(array $params, bool $secure = false): void
     {
@@ -52,8 +41,6 @@ class ToolMateVariable
     }
 
     /**
-     * @param string $name
-     * @param bool $secure
      * @return mixed|string
      */
     public function getCookie(string $name, bool $secure = false)
@@ -62,9 +49,6 @@ class ToolMateVariable
     }
 
     /**
-     * @param string $url
-     * @param array $params
-     * @return array
      * @throws \Exception
      */
     public function getVideoEmbed(string $url, array $params = []): array
