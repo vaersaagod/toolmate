@@ -47,7 +47,22 @@ class Settings extends Model
     public function init(): void
     {
         parent::init();
-        $this->setAttributes($this->getAttributes(), false);
+        if (version_compare(Craft::$app->getVersion(), '3.7.29', '>=')) {
+            $this->publicRoot = App::parseEnv($this->publicRoot ?? '@webroot');
+        } else {
+            $this->publicRoot = Craft::parseEnv($this->publicRoot ?? '@webroot');
+        }
+
+        if ($this->embedCacheDuration === null) {
+            $this->embedCacheDuration = Craft::$app->getConfig()->getGeneral()->cacheDuration;
+        } elseif ($this->embedCacheDuration !== false) {
+            $this->embedCacheDuration = ConfigHelper::durationInSeconds($this->embedCacheDuration);
+        }
+
+        if (!empty($this->embedCacheDurationOnError)) {
+            $this->embedCacheDurationOnError = ConfigHelper::durationInSeconds($this->embedCacheDurationOnError);
+        }
+        
     }
 
     /**
@@ -57,22 +72,6 @@ class Settings extends Model
      */
     public function setAttributes($values, $safeOnly = true): void
     {
-        if (version_compare(Craft::$app->getVersion(), '3.7.29', '>=')) {
-            $values['publicRoot'] = App::parseEnv($values['publicRoot'] ?? '@webroot');
-        } else {
-            $values['publicRoot'] = Craft::parseEnv($values['publicRoot'] ?? '@webroot');
-        }
-
-        if ($values['embedCacheDuration'] === null) {
-            $values['embedCacheDuration'] = Craft::$app->getConfig()->getGeneral()->cacheDuration;
-        } elseif ($values['embedCacheDuration'] !== false) {
-            $values['embedCacheDuration'] = ConfigHelper::durationInSeconds($values['embedCacheDuration']);
-        }
-
-        if (!empty($values['embedCacheDurationOnError'])) {
-            $values['embedCacheDurationOnError'] = ConfigHelper::durationInSeconds($values['embedCacheDurationOnError']);
-        }
-
         $this->setCsp($values['csp'] ?? []);
         unset($values['csp']);
 
