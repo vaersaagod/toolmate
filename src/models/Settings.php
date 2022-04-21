@@ -57,7 +57,11 @@ class Settings extends Model
      */
     public function setAttributes($values, $safeOnly = true): void
     {
-        $values['publicRoot'] = App::parseEnv($values['publicRoot'] ?? '@webroot');
+        if (version_compare(Craft::$app->getVersion(), '3.7.29', '>=')) {
+            $values['publicRoot'] = App::parseEnv($values['publicRoot'] ?? '@webroot');
+        } else {
+            $values['publicRoot'] = Craft::parseEnv($values['publicRoot'] ?? '@webroot');
+        }
 
         if ($values['embedCacheDuration'] === null) {
             $values['embedCacheDuration'] = Craft::$app->getConfig()->getGeneral()->cacheDuration;

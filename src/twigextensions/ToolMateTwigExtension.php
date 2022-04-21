@@ -65,9 +65,9 @@ class ToolMateTwigExtension extends AbstractExtension
     /**
      * @param string $name
      * @param bool $secure
-     * @return mixed|string
+     * @return mixed
      */
-    public function getCookie(string $name, bool $secure = false)
+    public function getCookie(string $name, bool $secure = false): mixed
     {
         return ToolMate::$plugin->tool->getCookie($name, $secure);
     }
@@ -88,7 +88,7 @@ class ToolMateTwigExtension extends AbstractExtension
      * @param bool $remote
      * @return false|string
      */
-    public function inline(string $fileName, bool $remote = false)
+    public function inline(string $fileName, bool $remote = false): bool|string
     {
         return ToolMate::$plugin->tool->inline($fileName, $remote);
     }

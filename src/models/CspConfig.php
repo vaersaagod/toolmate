@@ -10,6 +10,8 @@ use craft\base\Model;
  * @author    Værsågod
  * @package   ToolMate
  * @since     1.2.0
+ *
+ * @property array|CspDirectives $directives
  */
 class CspConfig extends Model
 {
