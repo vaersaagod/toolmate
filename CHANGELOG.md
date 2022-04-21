@@ -1,5 +1,12 @@
 # ToolMate Changelog
 
+## 1.3.0 - 2022-04-21
+### Added
+- Added support for Craft 4
+
+### Changed
+- ToolMate now requires PHP 8.0+
+
 ## 1.2.0.1 - 2022-02-14
 ### Fixed
 - Fixes an issue where Toolmate wasn't able to set the public web root path correctly
