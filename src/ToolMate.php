@@ -5,6 +5,7 @@ namespace vaersaagod\toolmate;
 use Craft;
 use craft\base\Plugin;
 use craft\events\TemplateEvent;
+use craft\helpers\App;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 
@@ -137,5 +138,17 @@ class ToolMate extends Plugin
                 ToolMate::getInstance()->csp->setHeader();
             }
         );
+    }
+    
+    /**
+     * @param string|null $value
+     * @return bool|string|null
+     */
+    public static function parseEnv(?string $value): bool|string|null
+    {
+        if (\version_compare(Craft::$app->getVersion(), '3.7.29', '<')) {
+            return Craft::parseEnv($value);
+        }
+        return App::parseEnv($value);
     }
 }

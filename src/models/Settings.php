@@ -6,6 +6,7 @@ use Craft;
 use craft\base\Model;
 use craft\helpers\App;
 use craft\helpers\ConfigHelper;
+use vaersaagod\toolmate\ToolMate;
 use yii\base\InvalidConfigException;
 
 /**
@@ -39,7 +40,7 @@ class Settings extends Model
      * @see getCsp()
      * @see setCsp()
      */
-    private ?CspConfig $_csp = null; 
+    private ?CspConfig $_csp = null;
 
     /**
      * @throws InvalidConfigException
@@ -47,31 +48,33 @@ class Settings extends Model
     public function init(): void
     {
         parent::init();
-        if (version_compare(Craft::$app->getVersion(), '3.7.29', '>=')) {
-            $this->publicRoot = App::parseEnv($this->publicRoot ?? '@webroot');
-        } else {
-            $this->publicRoot = Craft::parseEnv($this->publicRoot ?? '@webroot');
-        }
-
-        if ($this->embedCacheDuration === null) {
-            $this->embedCacheDuration = Craft::$app->getConfig()->getGeneral()->cacheDuration;
-        } elseif ($this->embedCacheDuration !== false) {
-            $this->embedCacheDuration = ConfigHelper::durationInSeconds($this->embedCacheDuration);
-        }
-
-        if (!empty($this->embedCacheDurationOnError)) {
-            $this->embedCacheDurationOnError = ConfigHelper::durationInSeconds($this->embedCacheDurationOnError);
-        }
-        
+        $this->setAttributes($this->getAttributes(), false);
     }
 
     /**
      * @param array $values
-     * @param bool $safeOnly
+     * @param bool  $safeOnly
+     *
      * @throws InvalidConfigException
      */
     public function setAttributes($values, $safeOnly = true): void
     {
+        if (array_key_exists('publicRoot', $values)) {
+            $values['publicRoot'] = ToolMate::parseEnv($values['publicRoot'] ?? '@webroot');
+        }
+
+        if (array_key_exists('embedCacheDuration', $values)) {
+            if ($values['embedCacheDuration'] === null) {
+                $values['embedCacheDuration'] = Craft::$app->getConfig()->getGeneral()->cacheDuration;
+            } elseif ($values['embedCacheDuration'] !== false) {
+                $values['embedCacheDuration'] = ConfigHelper::durationInSeconds($values['embedCacheDuration']);
+            }
+        }
+
+        if (array_key_exists('embedCacheDurationOnError', $values) && !empty($values['embedCacheDurationOnError'])) {
+            $values['embedCacheDurationOnError'] = ConfigHelper::durationInSeconds($values['embedCacheDurationOnError']);
+        }
+
         $this->setCsp($values['csp'] ?? []);
         unset($values['csp']);
 
@@ -80,6 +83,7 @@ class Settings extends Model
 
     /**
      * @param array $config
+     *
      * @return void
      */
     public function setCsp(array $config = []): void
@@ -95,6 +99,7 @@ class Settings extends Model
         if (!$this->_csp) {
             $this->_csp = new CspConfig();
         }
+
         return $this->_csp;
     }
 }
