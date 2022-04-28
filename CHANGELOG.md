@@ -1,5 +1,9 @@
 # ToolMate Changelog
 
+## 1.3.0.3 - 2022-04-28
+### Fixed
+- Fixed issue in Settings introduced in the Craft 4 refactoring.
+
 ## 1.3.0.2 - 2022-04-28
 ### Fixed
 - Fixed an issue where $_csp didn’t have a default value which caused error.
