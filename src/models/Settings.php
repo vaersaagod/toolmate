@@ -39,7 +39,7 @@ class Settings extends Model
      * @see getCsp()
      * @see setCsp()
      */
-    private ?CspConfig $_csp;
+    private ?CspConfig $_csp = null; 
 
     /**
      * @throws InvalidConfigException
