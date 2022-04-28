@@ -40,6 +40,7 @@
     "extra": {
         "name": "ToolMate",
         "handle": "toolmate",
+        "schemaVersion": "1.0.0",
         "hasCpSettings": false,
         "hasCpSection": false,
         "changelogUrl": "https://raw.githubusercontent.com/vaersaagod/toolmate/master/CHANGELOG.md",

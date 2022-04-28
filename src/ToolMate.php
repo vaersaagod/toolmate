@@ -42,14 +42,6 @@ class ToolMate extends Plugin
      */
     public static ToolMate $plugin;
 
-    // Public Properties
-    // =========================================================================
-
-    /**
-     * @var string
-     */
-    public string $schemaVersion = '1.0.0';
-
     // Public Methods
     // =========================================================================
 
