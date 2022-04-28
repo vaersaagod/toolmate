@@ -1,5 +1,9 @@
 # ToolMate Changelog
 
+## 1.3.0.1 - 2022-04-28
+### Fixed
+- Fixed an issue with `schemaVersion` in main plugin file being typed too hard.
+
 ## 1.3.0 - 2022-04-21
 ### Added
 - Added support for Craft 4
