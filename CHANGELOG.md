@@ -1,5 +1,9 @@
 # ToolMate Changelog
 
+## 1.3.0.2 - 2022-04-28
+### Fixed
+- Fixed an issue where $_csp didn’t have a default value which caused error.
+
 ## 1.3.0.1 - 2022-04-28
 ### Fixed
 - Fixed an issue with `schemaVersion` in main plugin file being typed too hard.
