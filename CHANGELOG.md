@@ -1,5 +1,9 @@
 # ToolMate Changelog
 
+## 1.3.1 - 2022-05-12
+### Fixed
+- Fixed an issue where ToolMate failed to include the `'unsafe-inline'` policy resource for the `style-src` CSP directive to `unsafe-inline`, for site requests where the Yii debug toolbar is enabled  
+
 ## 1.3.0.3 - 2022-04-28
 ### Fixed
 - Fixed issue in Settings introduced in the Craft 4 refactoring.

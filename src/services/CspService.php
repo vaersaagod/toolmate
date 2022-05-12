@@ -53,16 +53,18 @@ class CspService extends Component
         // Get directives
         $directivesConfig = $config->getDirectives();
 
-        // If this is a CP request, make sure some needed policies are included
         if (Craft::$app->getRequest()->getIsSiteRequest()) {
-            // If the Yii debug toolbar is visible on the front end, we unfortunately need to set the `unsafe-inline` policy for the script-src directive
+            // If the Yii debug toolbar is visible on the front end, we unfortunately need to set the `unsafe-inline` policy for the script-src and style-src directive
             $currentUser = Craft::$app->getUser()->getIdentity();
             if ($currentUser instanceof User && $currentUser->getPreference('enableDebugToolbarForSite')) {
                 $directivesConfig->scriptSrc[] = "'unsafe-inline' 'unsafe-eval'";
+                $directivesConfig->styleSrc[] = "'unsafe-inline'";
             }
         } elseif (Craft::$app->getRequest()->getIsCpRequest()) {
+            // If this is a CP request, make sure some needed policies are included
             $directivesConfig->frameAncestors[] = "'self'";
             $directivesConfig->scriptSrc[] = "'unsafe-inline' 'unsafe-eval'";
+            $directivesConfig->styleSrc[] = "'unsafe-inline'";
         }
 
         // Convert directive names to kebab-case, remove duplicates, etc
