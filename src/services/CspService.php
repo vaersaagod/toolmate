@@ -7,6 +7,8 @@ use craft\base\Component;
 
 use craft\elements\User;
 use craft\helpers\StringHelper;
+use craft\web\Response;
+
 use vaersaagod\toolmate\ToolMate;
 
 /**
@@ -44,32 +46,46 @@ class CspService extends Component
     }
 
     /**
+     * @param Response $response
      * @return void
      */
-    public function setHeader(): void
+    public function setHeader(Response $response): void
     {
+
         $config = ToolMate::getInstance()?->getSettings()->csp;
+        $request = Craft::$app->getRequest();
 
         // Get directives
         $directivesConfig = $config->getDirectives();
 
-        if (Craft::$app->getRequest()->getIsSiteRequest()) {
+        if ($request->getIsSiteRequest()) {
             // If the Yii debug toolbar is visible on the front end, we unfortunately need to set the `unsafe-inline` policy for the script-src and style-src directive
+            // Also include them if the Yii error page is returned (i.e. it's an error response and dev mode is enabled)
             $currentUser = Craft::$app->getUser()->getIdentity();
-            if ($currentUser instanceof User && $currentUser->getPreference('enableDebugToolbarForSite')) {
+            if (($currentUser instanceof User && $currentUser->getPreference('enableDebugToolbarForSite')) || ($response->getStatusCode() >= 400 && Craft::$app->getConfig()->getGeneral()->devMode)) {
                 $directivesConfig->scriptSrc[] = "'unsafe-inline' 'unsafe-eval'";
                 $directivesConfig->styleSrc[] = "'unsafe-inline'";
             }
-        } elseif (Craft::$app->getRequest()->getIsCpRequest()) {
+        } elseif ($request->getIsCpRequest()) {
             // If this is a CP request, make sure some needed policies are included
             $directivesConfig->frameAncestors[] = "'self'";
             $directivesConfig->scriptSrc[] = "'unsafe-inline' 'unsafe-eval'";
             $directivesConfig->styleSrc[] = "'unsafe-inline'";
+            $directivesConfig->fontSrc[] = 'data:';
+            // Stripe
+            $directivesConfig->scriptSrc[] = 'https://js.stripe.com';
+            $directivesConfig->frameSrc[] = 'https://js.stripe.com';
+            // Make sure Craft domains are supported
+            $pluginStoreService = Craft::$app->getPluginStore();
+            $directivesConfig->connectSrc[] = 'https://' . parse_url($pluginStoreService->craftApiEndpoint, PHP_URL_HOST);
+            $directivesConfig->connectSrc[] = 'https://' . parse_url($pluginStoreService->craftIdEndpoint, PHP_URL_HOST);
+            $directivesConfig->connectSrc[] = 'https://' . parse_url($pluginStoreService->craftOauthEndpoint, PHP_URL_HOST);
+            $directivesConfig->imgSrc[] = 'https://*.craft-cdn.com';
         }
 
         // Convert directive names to kebab-case, remove duplicates, etc
         $directivesArray = $config->getDirectives()->toArray();
-        $directives = \array_reduce(\array_keys($directivesArray), static function(array $carry, string $field) use ($directivesArray) {
+        $directives = \array_reduce(\array_keys($directivesArray), static function (array $carry, string $field) use ($directivesArray) {
             $policy = \array_filter(\explode(' ', \implode(' ', $directivesArray[$field])));
             if (empty($policy)) {
                 return $carry;
@@ -90,7 +106,7 @@ class CspService extends Component
             }
         }
 
-        // Clear nonces
+        // Clear memoized nonces
         $this->nonces = [];
 
         $cspValues = [];
@@ -101,10 +117,10 @@ class CspService extends Component
         $csp = \implode('; ', $cspValues) . ';';
 
         if ($config->reportOnly) {
-            Craft::$app->getResponse()->getHeaders()->set('Content-Security-Policy-Report-Only', $csp);
+            $response->getHeaders()->set('Content-Security-Policy-Report-Only', $csp);
             return;
         }
 
-        Craft::$app->getResponse()->getHeaders()->set('Content-Security-Policy', $csp);
+        $response->getHeaders()->set('Content-Security-Policy', $csp);
     }
 }

@@ -1,5 +1,14 @@
 # ToolMate Changelog
 
+## 1.4.0 - 2022-05-14
+### Added
+- Craft domains (i.e. Craft ID and the plugin store API) are now automatically included in the `connect-src` directive for control panel requests
+- `unsafe-inline` directives are now added automatically for Yii error pages   
+### Fixed
+- Fixes an issue where unhashed CSP nonces would not be included in the actual CSP header, on Craft 4.0 
+### Changed
+- Refactored logic concerning how and when the CSP header is set  
+
 ## 1.3.1 - 2022-05-12
 ### Fixed
 - Fixed an issue where ToolMate failed to include the `'unsafe-inline'` policy resource for the `style-src` CSP directive, for site requests where the Yii debug toolbar is enabled  

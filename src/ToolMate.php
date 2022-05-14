@@ -4,12 +4,11 @@ namespace vaersaagod\toolmate;
 
 use Craft;
 use craft\base\Plugin;
-use craft\events\TemplateEvent;
 use craft\helpers\App;
-use craft\web\Application;
+use craft\web\Response;
+use craft\web\TemplateResponseFormatter;
 use craft\web\twig\variables\CraftVariable;
 
-use craft\web\View;
 use vaersaagod\toolmate\models\Settings;
 use vaersaagod\toolmate\services\CspService;
 use vaersaagod\toolmate\services\EmbedService;
@@ -99,8 +98,12 @@ class ToolMate extends Plugin
         return new Settings();
     }
 
+    /**
+     * @return void
+     */
     protected function maybeSendCspHeader(): void
     {
+
         $cspConfig = self::getInstance()?->getSettings()->csp;
 
         if (!$cspConfig->enabled) {
@@ -111,31 +114,40 @@ class ToolMate extends Plugin
             return;
         }
 
-        // Replace hashed CSP nonces (this gets us around the template cache)
+        // Replace hashed nonces and set the CSP header for HTML responses
         Event::on(
-            View::class,
-            View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
-            static function(TemplateEvent $event) {
-                \preg_match_all('/nonce="([^"]*)"/', $event->output, $matches);
+            Response::class,
+            \yii\web\Response::EVENT_AFTER_PREPARE,
+            static function (Event $event) {
+                $response = $event->sender;
+                if (!$response instanceof Response || empty($response?->content)) {
+                    return;
+                }
+                $validFormats = [
+                    \yii\web\Response::FORMAT_RAW,
+                    \yii\web\Response::FORMAT_HTML,
+                ];
+                if (class_exists('craft\\web\\TemplateResponseFormatter')) {
+                    $validFormats[] = TemplateResponseFormatter::FORMAT;
+                }
+                if (!in_array($response?->format, $validFormats)) {
+                    return;
+                }
+                // Replace hashed CSP nonces (this gets us around the template cache)
+                \preg_match_all('/nonce="([^"]*)"/', $response->content, $matches);
                 $hashedNonces = $matches[1] ?? [];
+                $cspService = ToolMate::getInstance()->csp;
                 for ($i = 0, $iMax = \count($hashedNonces); $i < $iMax; ++$i) {
                     if (!$unhashedNonce = Craft::$app->getSecurity()->validateData($hashedNonces[$i])) {
                         continue;
                     }
                     [0 => $directive, 1 => $nonce] = \explode(':', $unhashedNonce);
-                    if (!ToolMate::getInstance()->csp->hasNonce($directive, $nonce)) {
-                        $nonce = ToolMate::getInstance()->csp->createNonce($directive);
+                    if (!$cspService->hasNonce($directive, $nonce)) {
+                        $nonce = $cspService->createNonce($directive);
                     }
-                    $event->output = \str_replace($matches[0][$i], "nonce=\"$nonce\"", $event->output);
+                    $response->content = \str_replace($matches[0][$i], "nonce=\"$nonce\"", $response->content);
                 }
-            }
-        );
-
-        Event::on(
-            Application::class,
-            \yii\base\Application::EVENT_AFTER_REQUEST,
-            static function(Event $event) {
-                ToolMate::getInstance()->csp->setHeader();
+                ToolMate::getInstance()->csp->setHeader($response);
             }
         );
     }
