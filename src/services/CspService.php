@@ -85,20 +85,27 @@ class CspService extends Component
 
         // Convert directive names to kebab-case, remove duplicates, etc
         $directivesArray = $config->getDirectives()->toArray();
-        $directives = \array_reduce(\array_keys($directivesArray), static function (array $carry, string $field) use ($directivesArray) {
-            $policy = \array_filter(\explode(' ', \implode(' ', $directivesArray[$field])));
-            if (empty($policy)) {
+        $directives = array_reduce(array_keys($directivesArray), static function (array $carry, string $field) use ($directivesArray) {
+            $policies = array_filter(explode(' ', implode(' ', $directivesArray[$field])));
+            if (empty($policies)) {
                 return $carry;
             }
-            $carry[StringHelper::toKebabCase($field)] = \array_values(\array_unique($policy));
+            $policies = array_values(array_unique($policies));
+            // Make sure any nonces and hashes from config are removed, if the directive contains 'unsafe-inline'
+            if (in_array("'unsafe-inline'", $policies)) {
+                $policies = array_filter($policies, static function ($policy) {
+                    return !str_starts_with($policy, "'nonce-") && !str_starts_with($policy, "'sha256-");
+                });
+            }
+            $carry[StringHelper::toKebabCase($field)] = $policies;
             return $carry;
         }, []);
-
-        // Add nonces
+        
+        // Add memoized nonces
         foreach ($this->nonces as $directive => $nonces) {
             $directives[$directive] = $directives[$directive] ?? [];
             foreach ($nonces as $nonce) {
-                if (\in_array("'unsafe-inline'", $directives[$directive], true)) {
+                if (in_array("'unsafe-inline'", $directives[$directive], true)) {
                     // Skip nonces for directives with unsafe-inline
                     continue;
                 }
@@ -111,10 +118,10 @@ class CspService extends Component
 
         $cspValues = [];
         foreach ($directives as $directive => $policies) {
-            $cspValues[] = $directive . ' ' . \implode(' ', $policies);
+            $cspValues[] = $directive . ' ' . implode(' ', $policies);
         }
 
-        $csp = \implode('; ', $cspValues) . ';';
+        $csp = implode('; ', $cspValues) . ';';
 
         if ($config->reportOnly) {
             $response->getHeaders()->set('Content-Security-Policy-Report-Only', $csp);

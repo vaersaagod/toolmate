@@ -1,5 +1,9 @@
 # ToolMate Changelog
 
+## Unreleased
+### Improved
+- ToolMate now removes any hard-coded nonces or hashes set in the CSP config, for any directives that also contain the `unsafe-inline` policy
+
 ## 1.4.0 - 2022-05-14
 ### Added
 - Craft domains (i.e. Craft ID and the plugin store API) are now automatically included in the `connect-src` directive for control panel requests
