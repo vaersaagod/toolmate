@@ -100,17 +100,16 @@ class CspService extends Component
             $carry[StringHelper::toKebabCase($field)] = $policies;
             return $carry;
         }, []);
-        
+
         // Add memoized nonces
         foreach ($this->nonces as $directive => $nonces) {
-            $directives[$directive] = $directives[$directive] ?? [];
-            foreach ($nonces as $nonce) {
-                if (in_array("'unsafe-inline'", $directives[$directive], true)) {
-                    // Skip nonces for directives with unsafe-inline
-                    continue;
-                }
-                $directives[$directive][] = "'nonce-" . $nonce . "'";
+            // Skip nonces for directives with unsafe-inline
+            if (empty($nonces) || in_array("'unsafe-inline'", $directives[$directive] ?? [])) {
+                continue;
             }
+            $directives[$directive] = array_merge($directives[$directive] ?? [], array_map(static function (string $nonce) {
+                return "'nonce-$nonce'";
+            }, $nonces));
         }
 
         // Clear memoized nonces

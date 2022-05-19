@@ -2,7 +2,7 @@
     "name": "vaersaagod/toolmate",
     "description": "Is that a tool in your pocket, or are you just happy to see me, mate?",
     "type": "craft-plugin",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "keywords": [
         "craft",
         "cms",

@@ -1,8 +1,9 @@
 # ToolMate Changelog
 
-## Unreleased
+## 1.4.1 - 2022-05-19
 ### Improved
 - ToolMate now removes any hard-coded nonces or hashes set in the CSP config, for any directives that also contain the `unsafe-inline` policy
+- ToolMate now avoids inadvertently creating CSP directives that could be empty, when adding nonces   
 
 ## 1.4.0 - 2022-05-14
 ### Added
