@@ -1,5 +1,9 @@
 # ToolMate Changelog
 
+## 1.4.2 - 2023-01-24
+### Fixed  
+- Added missing property declaration for Toolmate's minify service  
+
 ## 1.4.1 - 2022-05-19
 ### Improved
 - ToolMate now removes any hard-coded nonces or hashes set in the CSP config, for any directives that also contain the `unsafe-inline` policy

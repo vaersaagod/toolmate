@@ -29,6 +29,7 @@ use yii\log\FileTarget;
  * @property CspService $csp
  * @property EmbedService $embed
  * @property ToolService $tool
+ * @property MinifyService $minify
  * @property Settings $settings
  * @method Settings getSettings()
  */
