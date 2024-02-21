@@ -1,8 +1,12 @@
 # ToolMate Changelog
 
+## 1.5.0 - 2024-02-21
+### Added
+- Added support for Craft 5  
+
 ## 1.4.2 - 2023-01-24
 ### Fixed  
-- Added missing property declaration for Toolmate's minify service  
+- Fixed missing property declaration for Toolmate's minify service  
 
 ## 1.4.1 - 2022-05-19
 ### Improved
