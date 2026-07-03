@@ -56,7 +56,7 @@ class EmbedService extends Component
             } elseif ($params['cache_minutes'] === null) {
                 $cacheDuration = Craft::$app->getConfig()->getGeneral()->cacheDuration;
             } elseif (is_numeric($params['cache_minutes'])) {
-                $cacheDuration = floor((float)$params['cache_minutes'] * 60);
+                $cacheDuration = (int)floor((float)$params['cache_minutes'] * 60);
             } else {
                 throw new \Exception("Invalid param value for \"cache_minutes\" - it should be either false (for no caching) or a number (cache minutes)");
             }
@@ -167,10 +167,11 @@ class EmbedService extends Component
                 $videoInfo->html = substr($videoInfo->html, 0, $param_pos) . $embed_str . substr($videoInfo->html, $param_pos);
             } else {
                 // determine whether to add question mark to query string
-                preg_match('/<iframe.*?src="(.*?)".*?<\/iframe>/i', $videoInfo->html, $matches);
-                $append_query_marker = (str_contains($matches[1], '?') ? '' : '?');
+                if (preg_match('/<iframe.*?src="(.*?)".*?<\/iframe>/i', $videoInfo->html, $matches)) {
+                    $append_query_marker = (str_contains($matches[1], '?') ? '' : '?');
 
-                $videoInfo->html = preg_replace('/<iframe(.*?)src="(.*?)"(.*?)<\/iframe>/i', '<iframe$1src="$2' . $append_query_marker . '&wmode=' . $wmode . '"$3</iframe>', $videoInfo->html);
+                    $videoInfo->html = preg_replace('/<iframe(.*?)src="(.*?)"(.*?)<\/iframe>/i', '<iframe$1src="$2' . $append_query_marker . '&wmode=' . $wmode . '"$3</iframe>', $videoInfo->html);
+                }
             }
         }
 
@@ -294,7 +295,7 @@ class EmbedService extends Component
             // close the request
             curl_close($curl);
         } // do we have fopen?
-        elseif (ini_get('allow_url_fopen') === true) {
+        elseif (ini_get('allow_url_fopen')) {
             $videoHeader = ($videoInfo = file_get_contents($videoUrl)) ? '200' : true;
         } else {
             $videoHeader = $videoInfo = false;

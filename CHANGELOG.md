@@ -5,6 +5,15 @@
 - TLS certificate verification is now enabled for video embed (oEmbed) requests, and embed requests now time out after 30 seconds
 - The `inline()` and `stamp()` Twig functions no longer resolve files outside the configured `publicRoot`
 - `getVideoEmbed()` now HTML-encodes the `id`, `vimeo_player_id` and `class` params, and URL-encodes all query string params, to prevent markup injection
+### Fixed
+- Fixed an error that would occur if the `csp` setting was configured without a `directives` key
+- Fixed an issue where the legacy `cache_minutes` embed param would silently disable embed caching
+- Fixed a broken `allow_url_fopen` check, which prevented video embeds from working on servers without cURL
+- Fixed an issue where `setCookie()` would ignore the `secure` param and always set the `Secure` flag
+- Fixed a PHP exception that could occur when validating hashed CSP nonces
+- Fixed a PHP warning that could occur in `getVideoEmbed()` if the embed code didn't contain an iframe with a `src` attribute
+- Fixed a PHP warning that could occur when calling `stamp()` with an extensionless file name
+- Fixed an error that would occur when calling `inline()` with a protocol-relative URL in console requests
 
 ## 1.5.0 - 2024-02-21
 ### Added

@@ -139,7 +139,8 @@ class ToolMate extends Plugin
                 $hashedNonces = $matches[1] ?? [];
                 $cspService = ToolMate::getInstance()->csp;
                 for ($i = 0, $iMax = \count($hashedNonces); $i < $iMax; ++$i) {
-                    if (!$unhashedNonce = Craft::$app->getSecurity()->validateData($hashedNonces[$i])) {
+                    $unhashedNonce = Craft::$app->getSecurity()->validateData($hashedNonces[$i]);
+                    if (!$unhashedNonce || !\str_contains($unhashedNonce, ':')) {
                         continue;
                     }
                     [0 => $directive, 1 => $nonce] = \explode(':', $unhashedNonce);

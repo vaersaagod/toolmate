@@ -29,7 +29,7 @@ class CspConfig extends Model
      * @see getDirectives()
      * @see setDirectives()
      */
-    private ?CspDirectives $_directives;
+    private ?CspDirectives $_directives = null;
 
     /** @inheritdoc */
     public function setAttributes($values, $safeOnly = true): void

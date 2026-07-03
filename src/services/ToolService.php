@@ -30,8 +30,9 @@ class ToolService extends Component
     {
         if ($remote) {
             if (str_starts_with($fileName, '//')) {
-                $protocol = Craft::$app->getRequest()->isSecureConnection ? 'https:' : 'http:';
-                $fileName = $protocol . $fileName;
+                $request = Craft::$app->getRequest();
+                $isSecure = !$request instanceof \craft\web\Request || $request->getIsSecureConnection();
+                $fileName = ($isSecure ? 'https:' : 'http:') . $fileName;
             }
 
             return @file_get_contents($fileName);
@@ -70,19 +71,20 @@ class ToolService extends Component
         }
 
         $path_parts = pathinfo($fileName);
+        $extension = isset($path_parts['extension']) ? '.' . $path_parts['extension'] : '';
 
         $stamp = $type === 'hash' ? $this->numHashFile($filePath) : filemtime($filePath);
 
         if ($mode === 'file') {
-            return $path_parts['dirname'] . '/' . $path_parts['filename'] . '.' . $stamp . '.' . $path_parts['extension'];
+            return $path_parts['dirname'] . '/' . $path_parts['filename'] . '.' . $stamp . $extension;
         }
 
         if ($mode === 'folder') {
-            return $path_parts['dirname'] . '/' . $stamp . '/' . $path_parts['filename'] . '.' . $path_parts['extension'];
+            return $path_parts['dirname'] . '/' . $stamp . '/' . $path_parts['filename'] . $extension;
         }
 
         if ($mode === 'query') {
-            return $path_parts['dirname'] . '/' . $path_parts['filename'] . '.' . $path_parts['extension'] . '?ts=' . $stamp;
+            return $path_parts['dirname'] . '/' . $path_parts['filename'] . $extension . '?ts=' . $stamp;
         }
 
         if ($mode === 'tsonly' || $mode === 'only') {
@@ -153,7 +155,7 @@ class ToolService extends Component
                     'expires' => $params['expire'],
                     'path' => $params['path'],
                     'domain' => $params['domain'],
-                    'secure' => true,
+                    'secure' => $params['secure'],
                     'httponly' => $params['httpOnly'],
                     'samesite' => $params['sameSite'],
                 ]);
