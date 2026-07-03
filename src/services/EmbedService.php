@@ -104,9 +104,9 @@ class EmbedService extends Component
         $url .= urlencode($videoUrl);
 
         // set the semi-ubiquitous parameters
-        $maxWidth = isset($params['max_width']) ? '&maxwidth=' . $params['max_width'] : '';
-        $maxHeight = isset($params['max_height']) ? '&maxheight=' . $params['max_height'] : '';
-        $wmode_param = isset($params['wmode']) ? '&wmode=' . $params['wmode'] : '';
+        $maxWidth = isset($params['max_width']) ? '&maxwidth=' . rawurlencode((string)$params['max_width']) : '';
+        $maxHeight = isset($params['max_height']) ? '&maxheight=' . rawurlencode((string)$params['max_height']) : '';
+        $wmode_param = isset($params['wmode']) ? '&wmode=' . rawurlencode((string)$params['wmode']) : '';
         $url .= $maxWidth . $maxHeight . $wmode_param;
 
         // optional provider prefixed parameters
@@ -206,12 +206,14 @@ class EmbedService extends Component
             $id = $params['id'];
         }
         if (!empty($id)) {
+            $id = htmlspecialchars((string)$id, ENT_QUOTES);
             $videoInfo->html = preg_replace('/<iframe/i', '<iframe id="' . $id . '"', $videoInfo->html);
         }
 
         // add the class to the iFrame HTML if set
         if (!empty($params['class'])) {
-            $videoInfo->html = preg_replace('/<iframe/i', '<iframe class="' . $params['class'] . '"', $videoInfo->html);
+            $class = htmlspecialchars((string)$params['class'], ENT_QUOTES);
+            $videoInfo->html = preg_replace('/<iframe/i', '<iframe class="' . $class . '"', $videoInfo->html);
         }
 
         // add the attributes string to the iFrame HTML if set
@@ -281,7 +283,7 @@ class EmbedService extends Component
                 CURLOPT_URL => $videoUrl,
                 CURLOPT_RETURNTRANSFER => 1,
                 CURLOPT_CONNECTTIMEOUT => 10,
-                CURLOPT_SSL_VERIFYPEER => false, //no ssl verification
+                CURLOPT_TIMEOUT => 30,
             );
 
             curl_setopt_array($curl, $options);
@@ -347,7 +349,7 @@ class EmbedService extends Component
 
         if (!empty($pairs) && is_array($pairs)) {
             foreach ($pairs as $key => $value) {
-                $chunks[] = $key . '=' . $value;
+                $chunks[] = rawurlencode((string)$key) . '=' . rawurlencode((string)$value);
             }
         }
 

@@ -1,5 +1,11 @@
 # ToolMate Changelog
 
+## Unreleased
+### Security
+- TLS certificate verification is now enabled for video embed (oEmbed) requests, and embed requests now time out after 30 seconds
+- The `inline()` and `stamp()` Twig functions no longer resolve files outside the configured `publicRoot`
+- `getVideoEmbed()` now HTML-encodes the `id`, `vimeo_player_id` and `class` params, and URL-encodes all query string params, to prevent markup injection
+
 ## 1.5.0 - 2024-02-21
 ### Added
 - Added support for Craft 5  

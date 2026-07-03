@@ -37,10 +37,14 @@ class ToolService extends Component
             return @file_get_contents($fileName);
         }
 
-        $documentRoot = ToolMate::getInstance()?->getSettings()->publicRoot;
-        $filePath = FileHelper::normalizePath($documentRoot . '/' . $fileName);
+        $filePath = $this->resolvePublicPath($fileName);
 
-        if ($fileName !== '' && file_exists($filePath)) {
+        if ($filePath === null) {
+            Craft::error('File `' . $fileName . '` resolves to a path outside the public root, mate!', __METHOD__);
+            return '';
+        }
+
+        if (file_exists($filePath)) {
             return @file_get_contents($filePath);
         }
 
@@ -58,11 +62,10 @@ class ToolService extends Component
      */
     public function stamp(string $fileName, string $mode = 'file', string $type = 'ts'): string
     {
-        $documentRoot = ToolMate::getInstance()?->getSettings()->publicRoot;
-        $filePath = FileHelper::normalizePath($documentRoot . '/' . $fileName);
+        $filePath = $this->resolvePublicPath($fileName);
 
-        if ($fileName === '' || !file_exists($filePath)) {
-            Craft::error('File `' . $filePath . '` not found, mate!', __METHOD__);
+        if ($filePath === null || !file_exists($filePath)) {
+            Craft::error('File `' . $fileName . '` not found, mate!', __METHOD__);
             return '';
         }
 
@@ -197,6 +200,29 @@ class ToolService extends Component
     /**
      * ----- Private methods -----------------------------------------------
      */
+
+    /**
+     * Resolves a file name to an absolute path inside the public root.
+     * Returns null if the file name is empty, or if the resolved path escapes the public root.
+     *
+     * @param string $fileName
+     * @return string|null
+     */
+    private function resolvePublicPath(string $fileName): ?string
+    {
+        if ($fileName === '') {
+            return null;
+        }
+
+        $documentRoot = FileHelper::normalizePath((string)ToolMate::getInstance()?->getSettings()->publicRoot);
+        $filePath = FileHelper::normalizePath($documentRoot . DIRECTORY_SEPARATOR . $fileName);
+
+        if (!str_starts_with($filePath, $documentRoot . DIRECTORY_SEPARATOR)) {
+            return null;
+        }
+
+        return $filePath;
+    }
 
     /**
      * Exactly like hash_file except that the result is always numeric
