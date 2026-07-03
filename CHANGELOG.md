@@ -1,6 +1,6 @@
 # ToolMate Changelog
 
-## Unreleased
+## 1.6.0 - 2026-07-03
 ### Security
 - TLS certificate verification is now enabled for video embed (oEmbed) requests, and embed requests now time out after 30 seconds
 - The `inline()` and `stamp()` Twig functions no longer resolve files outside the configured `publicRoot`
